@@ -1,7 +1,9 @@
 package com.github.writeback.client;
 
+
 public class WriteBackClient {
 	static final long DEFAULT_WRITEBACK_PERIOD_INMILLIS = 1000 * 60 * 5;
+	static final Object mutex = new Object();
 	private CoRepository coRepository;
 	private OriginalRepository originalRepository;
 	private PeriodicWriteBack periodicWriteBack;
@@ -18,29 +20,45 @@ public class WriteBackClient {
 	}
 
 	public WriteBackItem select(String key) {
-		readFromOriginalRepositoryIfNeeds(key);
+		saveInitialValueFromOriginalRepositoryIfThereIsNo(key);
 		return coRepository.select(key);
 	}
 
 	public void update(WriteBackItem item) {
-		readFromOriginalRepositoryIfNeeds(item.getKey());
+		saveInitialValueFromOriginalRepositoryIfThereIsNo(item.getKey());
 		coRepository.update(item);
 	}
 
 	public void increase(String key) {
-		readFromOriginalRepositoryIfNeeds(key);
+		saveInitialValueFromOriginalRepositoryIfThereIsNo(key);
 		coRepository.increase(key);
 	}
 
 	public void decrease(String key) {
-		readFromOriginalRepositoryIfNeeds(key);
+		saveInitialValueFromOriginalRepositoryIfThereIsNo(key);
 		coRepository.decrease(key);
 	}
 
-	private void readFromOriginalRepositoryIfNeeds(String key) {
-		if (coRepository.exists(key) == false) {
-			coRepository.insert(originalRepository.read(key));
+	private void saveInitialValueFromOriginalRepositoryIfThereIsNo(String key) {
+		if (coRepository.exists(key)) {
+			return;
+		}
+
+		if (coRepository.lock(key) == false) {
+			try {
+				synchronized (mutex) {
+					mutex.wait();					
+				}
+			} catch (InterruptedException e) {
+			}
+			return;
+		}
+
+		coRepository.insert(originalRepository.read(key));
+		coRepository.unlock(key);
+
+		synchronized (mutex) {
+			mutex.notifyAll();			
 		}
 	}
-
 }

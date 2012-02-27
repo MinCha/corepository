@@ -27,4 +27,8 @@ public interface CoRepository {
 	boolean exists(String key);
 
 	List<WriteBackItem> selectAll();
+
+	boolean lock(String key);
+	
+	boolean unlock(String key);
 }

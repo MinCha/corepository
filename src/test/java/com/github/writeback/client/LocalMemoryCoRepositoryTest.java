@@ -119,7 +119,22 @@ public class LocalMemoryCoRepositoryTest {
 		assertThat(result, hasItem(new WriteBackItem("2", 1)));
 		assertThat(result, hasItem(new WriteBackItem("3", 1)));
 	}
-	
+
+	@Test
+	public void canLockKey() {
+		assertThat(sut.lock("keyA"), is(true));
+		assertThat(sut.lock("keyA"), is(false));
+		assertThat(sut.lock("keyB"), is(true));
+	}
+
+	@Test
+	public void canUnockKey() {
+		assertThat(sut.lock("keyA"), is(true));
+		assertThat(sut.lock("keyA"), is(false));
+		assertThat(sut.unlock("keyA"), is(true));
+		assertThat(sut.lock("keyA"), is(true));
+	}
+
 	@Test
 	public void canSaveAtLeastOneMillionItems() {
 		for (int i = 0; i < 1000000; i++) {
