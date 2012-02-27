@@ -137,8 +137,13 @@ public class LocalMemoryCoRepositoryTest {
 
 	@Test
 	public void canSaveAtLeastOneMillionItems() {
-		for (int i = 0; i < 1000000; i++) {
-			sut.insert(new WriteBackItem("domain key is " + i, i));
+		final String keyPrefix = "domain key is ";
+		final long oneMillion = 100 * 10000;
+		for (long i = 0; i < oneMillion; i++) {
+			sut.insert(new WriteBackItem(keyPrefix + i, i));
 		}
+		
+		assertThat(sut.select(keyPrefix + "0").getValueAsLong(), is(0L));
+		assertThat(sut.select(keyPrefix + oneMillion / 2).getValueAsLong(), is(oneMillion / 2));
 	}
 }

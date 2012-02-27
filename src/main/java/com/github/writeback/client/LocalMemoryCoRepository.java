@@ -63,7 +63,9 @@ public class LocalMemoryCoRepository implements CoRepository {
 	}
 
 	public void insert(WriteBackItem item) {
-		items.put(item.getKey(), item.getValue());
+		synchronized (mutex) {
+			items.put(item.getKey(), item.getValue());
+		}
 	}
 
 	private void assertThatThereIsKey(String key) {

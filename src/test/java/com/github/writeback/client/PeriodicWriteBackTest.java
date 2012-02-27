@@ -18,14 +18,15 @@ public class PeriodicWriteBackTest {
 
 	@Test
 	public void shouldWriteBackToOriginalRepositoryPeriodically() throws InterruptedException {
-		sut = new PeriodicWriteBack(coRepository, originalRepository, 10);
+		final long writeBackPeriodInMills = 10;
+		sut = new PeriodicWriteBack(coRepository, originalRepository, writeBackPeriodInMills);
 		final long value = 10L;
 		coRepository.insert(new WriteBackItem(key, "1L"));
 		coRepository.update(new WriteBackItem(key, value));
 		
 		sut.start();
 
-		Thread.sleep(10 + 5);
+		Thread.sleep(writeBackPeriodInMills * 2);
 		WriteBackItem result = originalRepository.read(key);
 		assertThat(result.getValueAsLong(), is(value));
 	}
