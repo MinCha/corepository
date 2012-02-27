@@ -1,15 +1,20 @@
 package com.github.writeback.client;
 
 public class WriteBackClient {
+	static final long DEFAULT_WRITEBACK_PERIOD_INMILLIS = 1000 * 60 * 5;
 	private CoRepository coRepository;
 	private OriginalRepository originalRepository;
 	private PeriodicWriteBack periodicWriteBack;
-	
-	public WriteBackClient(CoRepository coRepository, OriginalRepository originalRepository) {
+
+	public WriteBackClient(CoRepository coRepository, OriginalRepository originalRepository, long writeBackPeriodInMillis) {
 		this.coRepository = coRepository;
 		this.originalRepository = originalRepository;
-		periodicWriteBack = new PeriodicWriteBack(coRepository, originalRepository);
-		periodicWriteBack.start();
+		periodicWriteBack = new PeriodicWriteBack(coRepository, originalRepository, writeBackPeriodInMillis);
+		periodicWriteBack.start();		
+	}
+
+	public WriteBackClient(CoRepository coRepository, OriginalRepository originalRepository) {
+		this(coRepository, originalRepository, DEFAULT_WRITEBACK_PERIOD_INMILLIS);
 	}
 
 	public WriteBackItem select(String key) {

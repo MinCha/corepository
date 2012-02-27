@@ -35,9 +35,4 @@ public class PeriodicWriteBackTest {
 		sut = new PeriodicWriteBack(coRepository, originalRepository, 10);
 		sut.start();
 	}
-
-	@Test
-	public void canCreateWithDefaultWriteBackPeriod() throws InterruptedException {
-		sut = new PeriodicWriteBack(coRepository, originalRepository);
-	}
 }
