@@ -6,6 +6,7 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
 import com.github.writeback.client.support.FakeOriginalRepository;
+import com.github.writeback.client.support.FakeVisitationDAO;
 
 public class PeriodicWriteBackTest {
 	private PeriodicWriteBack sut;

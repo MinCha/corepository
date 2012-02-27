@@ -1,6 +1,5 @@
 package com.github.writeback.client.support;
 
-import com.github.writeback.client.FakeVisitationDAO;
 import com.github.writeback.client.OriginalRepository;
 import com.github.writeback.client.WriteBackItem;
 
