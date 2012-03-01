@@ -1,11 +1,11 @@
 package com.github.writeback.client;
 
 public class WriteBackClient {
-	static final long DEFAULT_WRITEBACK_PERIOD_INMILLIS = 1000 * 60 * 5;
-	static final Object mutex = new Object();
+	private static final long DEFAULT_WRITEBACK_PERIOD_INMILLIS = 1000 * 60 * 5;
 	private CoRepository coRepository;
 	private OriginalRepository originalRepository;
 	private PeriodicWriteBack periodicWriteBack;
+	private KeyBasedMutexProvider mutex = new KeyBasedMutexProvider(1000);
 
 	public WriteBackClient(CoRepository coRepository,
 			OriginalRepository originalRepository, long writeBackPeriodInMillis) {
@@ -51,23 +51,23 @@ public class WriteBackClient {
 			coRepository.insert(originalRepository.read(key));
 			coRepository.unlock(key);
 
-			wakeUpAllThreadsWatingForPulling();
+			wakeUpAllThreadsWatingForPulling(key);
 		} else {
 			waitUnitlInitialValueIsPulled(key);
 		}
 	}
 
-	private void wakeUpAllThreadsWatingForPulling() {
-		synchronized (mutex) {
-			mutex.notifyAll();
+	private void wakeUpAllThreadsWatingForPulling(String key) {
+		synchronized (mutex.get(key)) {
+			mutex.get(key).notifyAll();
 		}
 	}
 
 	private void waitUnitlInitialValueIsPulled(String key) {
-		synchronized (mutex) {
+		synchronized (mutex.get(key)) {
 			while (coRepository.exists(key) == false) {
 				try {
-					mutex.wait(10);
+					mutex.get(key).wait(10);
 				} catch (InterruptedException e) {
 				}
 			}
