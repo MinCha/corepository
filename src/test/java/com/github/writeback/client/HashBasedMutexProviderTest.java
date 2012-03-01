@@ -6,8 +6,8 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-public class PartialLockProviderTest {
-	private KeyBasedMutexProvider sut;
+public class HashBasedMutexProviderTest {
+	private HashBasedMutexProvider sut;
 	
 	@Test
 	public void shouldProvideSeperatedLocksByKey() {
@@ -16,7 +16,7 @@ public class PartialLockProviderTest {
 		long c = 3L;
 		
 		final int lockCount = 3; 
-		sut = new KeyBasedMutexProvider(lockCount);
+		sut = new HashBasedMutexProvider(lockCount);
 		
 		assertThat(sut.get(a), is(not(sut.get(b))));
 		assertThat(sut.get(b), is(not(sut.get(c))));

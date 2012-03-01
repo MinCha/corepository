@@ -5,7 +5,7 @@ public class WriteBackClient {
 	private CoRepository coRepository;
 	private OriginalRepository originalRepository;
 	private PeriodicWriteBack periodicWriteBack;
-	private KeyBasedMutexProvider mutex = new KeyBasedMutexProvider(1000);
+	private HashBasedMutexProvider mutex = new HashBasedMutexProvider(1000);
 
 	public WriteBackClient(CoRepository coRepository,
 			OriginalRepository originalRepository, long writeBackPeriodInMillis) {

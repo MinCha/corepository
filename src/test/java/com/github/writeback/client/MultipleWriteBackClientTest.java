@@ -13,8 +13,6 @@ import org.junit.Test;
 
 import com.github.writeback.client.support.FakeOriginalRepository;
 import com.github.writeback.client.support.FakeVisitationDAO;
-import com.github.writeback.client.support.OnlyDecreaseThread;
-import com.github.writeback.client.support.OnlyIncreaseThread;
 
 public class MultipleWriteBackClientTest {
 	private List<WriteBackClient> clients = new ArrayList<WriteBackClient>();
@@ -30,8 +28,15 @@ public class MultipleWriteBackClientTest {
 		ExecutorService executors = Executors.newFixedThreadPool(clientCount);
 		
 		for (int i = 0; i < clientCount; i++) {
-			clients.add(new WriteBackClient(coRepository, originalRepository));
-			executors.submit(new OnlyIncreaseThread(key, clients.get(i), callCount));
+			final WriteBackClient client = new WriteBackClient(coRepository, originalRepository);
+			clients.add(client);
+			executors.submit(new Runnable() {
+				public void run() {
+					for (int i = 0; i < callCount; i++) {
+						client.increase(key);
+					}
+				}
+			});
 		}
 		executors.shutdown();
 		executors.awaitTermination(5, TimeUnit.SECONDS);
@@ -47,12 +52,26 @@ public class MultipleWriteBackClientTest {
 		ExecutorService executors = Executors.newFixedThreadPool(clientCount);
 		
 		for (int i = 0; i < clientCount / 2; i++) {
-			clients.add(new WriteBackClient(coRepository, originalRepository));
-			executors.submit(new OnlyIncreaseThread(key, clients.get(i), callCount));
+			final WriteBackClient client = new WriteBackClient(coRepository, originalRepository);
+			clients.add(client);
+			executors.submit(new Runnable() {
+				public void run() {
+					for (int i = 0; i < callCount; i++) {
+						client.increase(key);
+					}
+				}
+			});
 		}
 		for (int i = clientCount / 2; i < clientCount; i++) {
-			clients.add(new WriteBackClient(coRepository, originalRepository));
-			executors.submit(new OnlyDecreaseThread(key, clients.get(i), callCount));
+			final WriteBackClient client = new WriteBackClient(coRepository, originalRepository);
+			clients.add(client);
+			executors.submit(new Runnable() {
+				public void run() {
+					for (int i = 0; i < callCount; i++) {
+						client.decrease(key);
+					}
+				}
+			});
 		}
 
 		executors.shutdown();

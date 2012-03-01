@@ -22,8 +22,8 @@ import com.github.writeback.client.exception.NotNumericValueException;
  */
 public class LocalMemoryCoRepository implements CoRepository {
 	private Map<String, Object> locks = new ConcurrentHashMap<String, Object>();
-	private Object mutex = new Object();
 	private Map<String, Object> items = new ConcurrentHashMap<String, Object>();
+	private HashBasedMutexProvider mutex = new HashBasedMutexProvider(1000);
 
 	public WriteBackItem select(String key) {
 		assertThatThereIsKey(key);
@@ -34,7 +34,7 @@ public class LocalMemoryCoRepository implements CoRepository {
 	public void update(WriteBackItem item) {
 		assertThatThereIsKey(item.getKey());
 
-		synchronized (mutex) {
+		synchronized (mutex.get(item.getKey())) {
 			items.put(item.getKey(), item.getValue());
 		}
 	}
@@ -42,7 +42,7 @@ public class LocalMemoryCoRepository implements CoRepository {
 	public void increase(String key) {
 		assertThatThereIsKey(key);
 
-		synchronized (mutex) {
+		synchronized (mutex.get(key)) {
 			Object result = items.get(key);
 			long value = covertLongFrom(result);
 			value++;
@@ -53,7 +53,7 @@ public class LocalMemoryCoRepository implements CoRepository {
 	public void decrease(String key) {
 		assertThatThereIsKey(key);
 
-		synchronized (mutex) {
+		synchronized (mutex.get(key)) {
 			Object result = items.get(key);
 			long value = covertLongFrom(result);
 			value--;
@@ -63,7 +63,7 @@ public class LocalMemoryCoRepository implements CoRepository {
 	}
 
 	public void insert(WriteBackItem item) {
-		synchronized (mutex) {
+		synchronized (mutex.get(item.getKey())) {
 			items.put(item.getKey(), item.getValue());
 		}
 	}
@@ -99,7 +99,7 @@ public class LocalMemoryCoRepository implements CoRepository {
 		return value;
 	}
 
-	public synchronized boolean lock(String key) {
+	public boolean lock(String key) {
 		if (locks.containsKey(key)) {
 			return false;
 		} else {
@@ -108,7 +108,7 @@ public class LocalMemoryCoRepository implements CoRepository {
 		}
 	}
 
-	public synchronized boolean unlock(String key) {
+	public boolean unlock(String key) {
 		if (locks.containsKey(key)) {
 			locks.remove(key);
 			return true;
