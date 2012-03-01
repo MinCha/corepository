@@ -26,7 +26,7 @@ public class PeriodicWriteBackTest {
 		
 		sut.start();
 
-		Thread.sleep(writeBackPeriodInMills * 2);
+		Thread.sleep(writeBackPeriodInMills * 10);
 		WriteBackItem result = originalRepository.read(key);
 		assertThat(result.getValueAsLong(), is(value));
 	}

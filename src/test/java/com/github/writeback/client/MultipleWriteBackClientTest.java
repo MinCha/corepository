@@ -22,11 +22,11 @@ public class MultipleWriteBackClientTest {
 	private final String key = "key";
 	private CoRepository coRepository = new LocalMemoryCoRepository();
 	private OriginalRepository originalRepository = new FakeOriginalRepository(new FakeVisitationDAO());
-	
+
 	@Test
 	public void mulpipleClientsShouldShareOneCoRepositoryWithoutConflict() throws InterruptedException {
 		final int clientCount = 100;
-		final int callCount = 150;
+		final int callCount = 300;
 		ExecutorService executors = Executors.newFixedThreadPool(clientCount);
 		
 		for (int i = 0; i < clientCount; i++) {
@@ -43,7 +43,7 @@ public class MultipleWriteBackClientTest {
 	@Test
 	public void mulpipleClientsCanIncreaseAndDecreaseOnSameKeyWithoutConflict() throws InterruptedException {
 		final int clientCount = 100;
-		final int callCount = 150;
+		final int callCount = 300;
 		ExecutorService executors = Executors.newFixedThreadPool(clientCount);
 		
 		for (int i = 0; i < clientCount / 2; i++) {
