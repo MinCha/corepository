@@ -13,7 +13,7 @@ package com.github.writeback.client;
  * @author Min Cha
  */
 public interface OriginalRepository {
-	WriteBackItem read(String key);
+	WriteBackItem read(Object key);
 
 	void writeBack(WriteBackItem item);
 }

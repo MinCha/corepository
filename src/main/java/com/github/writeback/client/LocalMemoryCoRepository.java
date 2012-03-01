@@ -21,11 +21,11 @@ import com.github.writeback.client.exception.NotNumericValueException;
  * @author Min Cha
  */
 public class LocalMemoryCoRepository implements CoRepository {
-	private Map<String, Object> locks = new ConcurrentHashMap<String, Object>();
-	private Map<String, Object> items = new ConcurrentHashMap<String, Object>();
+	private Map<Object, Object> locks = new ConcurrentHashMap<Object, Object>();
+	private Map<Object, Object> items = new ConcurrentHashMap<Object, Object>();
 	private HashBasedMutexProvider mutex = new HashBasedMutexProvider();
 
-	public WriteBackItem select(String key) {
+	public WriteBackItem select(Object key) {
 		assertThatThereIsKey(key);
 
 		return new WriteBackItem(key, items.get(key));
@@ -39,7 +39,7 @@ public class LocalMemoryCoRepository implements CoRepository {
 		}
 	}
 
-	public void increase(String key) {
+	public void increase(Object key) {
 		assertThatThereIsKey(key);
 
 		synchronized (mutex.get(key)) {
@@ -50,7 +50,7 @@ public class LocalMemoryCoRepository implements CoRepository {
 		}
 	}
 
-	public void decrease(String key) {
+	public void decrease(Object key) {
 		assertThatThereIsKey(key);
 
 		synchronized (mutex.get(key)) {
@@ -68,20 +68,20 @@ public class LocalMemoryCoRepository implements CoRepository {
 		}
 	}
 
-	private void assertThatThereIsKey(String key) {
+	private void assertThatThereIsKey(Object key) {
 		if (items.containsKey(key) == false) {
 			throw new NonexistentKeyException("Key does not exist : " + key);
 		}
 	}
 
-	public boolean exists(String key) {
+	public boolean exists(Object key) {
 		return items.containsKey(key);
 	}
 
 	public List<WriteBackItem> selectAll() {
 		List<WriteBackItem> result = new ArrayList<WriteBackItem>();
 
-		for (String each : items.keySet()) {
+		for (Object each : items.keySet()) {
 			result.add(new WriteBackItem(each, items.get(each)));
 		}
 
@@ -99,7 +99,7 @@ public class LocalMemoryCoRepository implements CoRepository {
 		return value;
 	}
 
-	public boolean lock(String key) {
+	public boolean lock(Object key) {
 		if (locks.containsKey(key)) {
 			return false;
 		} else {
@@ -108,7 +108,7 @@ public class LocalMemoryCoRepository implements CoRepository {
 		}
 	}
 
-	public boolean unlock(String key) {
+	public boolean unlock(Object key) {
 		if (locks.containsKey(key)) {
 			locks.remove(key);
 			return true;

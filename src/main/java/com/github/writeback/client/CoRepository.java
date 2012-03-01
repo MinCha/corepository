@@ -14,21 +14,21 @@ import java.util.List;
  * 
  */
 public interface CoRepository {
-	WriteBackItem select(String key);
+	WriteBackItem select(Object key);
 
 	void update(WriteBackItem item);
 
 	void insert(WriteBackItem item);
 
-	void increase(String key);
+	void increase(Object key);
 
-	void decrease(String key);
+	void decrease(Object key);
 
-	boolean exists(String key);
+	boolean exists(Object key);
 
 	List<WriteBackItem> selectAll();
-
-	boolean lock(String key);
 	
-	boolean unlock(String key);
+	boolean lock(Object key);
+	
+	boolean unlock(Object key);
 }

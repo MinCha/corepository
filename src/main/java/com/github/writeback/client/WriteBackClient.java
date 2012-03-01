@@ -42,7 +42,7 @@ public class WriteBackClient {
 		coRepository.decrease(key);
 	}
 
-	private void pullInitialValueIfThereIsNo(String key) {
+	private void pullInitialValueIfThereIsNo(Object key) {
 		if (coRepository.exists(key)) {
 			return;
 		}
@@ -51,19 +51,19 @@ public class WriteBackClient {
 			coRepository.insert(originalRepository.read(key));
 			coRepository.unlock(key);
 
-			wakeUpAllThreadsWatingForPulling(key);
+			wakeUpAllThreadsWatingForCompletingPull(key);
 		} else {
 			waitUnitlInitialValueIsPulled(key);
 		}
 	}
 
-	private void wakeUpAllThreadsWatingForPulling(String key) {
+	private void wakeUpAllThreadsWatingForCompletingPull(Object key) {
 		synchronized (mutex.get(key)) {
 			mutex.get(key).notifyAll();
 		}
 	}
 
-	private void waitUnitlInitialValueIsPulled(String key) {
+	private void waitUnitlInitialValueIsPulled(Object key) {
 		synchronized (mutex.get(key)) {
 			while (coRepository.exists(key) == false) {
 				try {

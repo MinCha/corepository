@@ -10,8 +10,8 @@ public class FakeOriginalRepository implements OriginalRepository {
 		this.visitationDAO = visitationDAO;
 	}
 
-	public WriteBackItem read(String key) {
-		long value = visitationDAO.selectVisitationCount(key);
+	public WriteBackItem read(Object key) {
+		long value = visitationDAO.selectVisitationCount((String) key);
 		return new WriteBackItem(key, value);
 	}
 

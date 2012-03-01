@@ -11,7 +11,7 @@ public class FakeVisitationDAO {
 		return result == null ? 0L : result;
 	}
 
-	public void updateVisitionCount(String key, long value) {
-		table.put(key, value);
+	public void updateVisitionCount(Object key, long value) {
+		table.put((String) key, value);
 	}
 }
