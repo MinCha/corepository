@@ -23,7 +23,7 @@ import com.github.writeback.client.exception.NotNumericValueException;
 public class LocalMemoryCoRepository implements CoRepository {
 	private Map<String, Object> locks = new ConcurrentHashMap<String, Object>();
 	private Map<String, Object> items = new ConcurrentHashMap<String, Object>();
-	private HashBasedMutexProvider mutex = new HashBasedMutexProvider(1000);
+	private HashBasedMutexProvider mutex = new HashBasedMutexProvider();
 
 	public WriteBackItem select(String key) {
 		assertThatThereIsKey(key);

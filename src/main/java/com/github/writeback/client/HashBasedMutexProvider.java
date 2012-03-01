@@ -4,9 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 class HashBasedMutexProvider {
+	private static final int DEFAULT_DISPERSION = 1000;
 	private List<Object> mutexes = new ArrayList<Object>();
 	private int dispersion;
 
+	HashBasedMutexProvider() {
+		this(DEFAULT_DISPERSION);
+	}
+	
 	HashBasedMutexProvider(int dispersion) {
 		this.dispersion = dispersion;
 		for (int i = 0; i < dispersion; i++) {
