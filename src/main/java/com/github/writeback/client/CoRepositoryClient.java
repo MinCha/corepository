@@ -1,33 +1,40 @@
 package com.github.writeback.client;
 
-public class WriteBackClient {
+import com.google.code.simplelrucache.ConcurrentLruCache;
+import com.google.code.simplelrucache.LruCache;
+
+
+public class CoRepositoryClient {
 	private static final long DEFAULT_WRITEBACK_PERIOD_INMILLIS = 1000 * 60 * 5;
+	private static final Object dummyValue = new Object();
 	private CoRepository coRepository;
 	private OriginalRepository originalRepository;
-	private PeriodicWriteBack periodicWriteBack;
 	private HashBasedMutexProvider mutex = new HashBasedMutexProvider();
+	private LruCache<String, Object> keys = new ConcurrentLruCache<String, Object>(1000, Long.MAX_VALUE);
 
-	public WriteBackClient(CoRepository coRepository,
+	public CoRepositoryClient(CoRepository coRepository,
 			OriginalRepository originalRepository, long writeBackPeriodInMillis) {
 		this.coRepository = coRepository;
 		this.originalRepository = originalRepository;
-		periodicWriteBack = new PeriodicWriteBack(coRepository,
-				originalRepository, writeBackPeriodInMillis);
-		periodicWriteBack.start();
 	}
 
-	public WriteBackClient(CoRepository coRepository,
+	public CoRepositoryClient(CoRepository coRepository,
 			OriginalRepository originalRepository) {
 		this(coRepository, originalRepository,
 				DEFAULT_WRITEBACK_PERIOD_INMILLIS);
 	}
 
-	public WriteBackItem select(String key) {
+	public Item selectAsString(String key) {
 		pullInitialValueIfThereIsNo(key);
-		return coRepository.select(key);
+		return coRepository.selectAsString(key);
 	}
 
-	public void update(WriteBackItem item) {
+	public Item selectAsInt(String key) {
+		pullInitialValueIfThereIsNo(key);
+		return coRepository.selectAsInt(key);
+	}
+	
+	public void update(Item item) {
 		pullInitialValueIfThereIsNo(item.getKey());
 		coRepository.update(item);
 	}
@@ -42,15 +49,19 @@ public class WriteBackClient {
 		coRepository.decrease(key);
 	}
 
-	private void pullInitialValueIfThereIsNo(Object key) {
+	private void pullInitialValueIfThereIsNo(String key) {
+		if (keys.contains(key)) {
+			return;
+		} 
+		
 		if (coRepository.exists(key)) {
 			return;
 		}
-
+		
 		if (coRepository.lock(key)) {
 			coRepository.insert(originalRepository.read(key));
+			keys.put(key, dummyValue);
 			coRepository.unlock(key);
-
 			wakeUpAllThreadsWatingForCompletingPull(key);
 		} else {
 			waitUnitlInitialValueIsPulled(key);
@@ -63,7 +74,7 @@ public class WriteBackClient {
 		}
 	}
 
-	private void waitUnitlInitialValueIsPulled(Object key) {
+	private void waitUnitlInitialValueIsPulled(String key) {
 		synchronized (mutex.get(key)) {
 			while (coRepository.exists(key) == false) {
 				try {

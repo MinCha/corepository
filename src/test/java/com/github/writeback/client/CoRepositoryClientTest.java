@@ -8,8 +8,8 @@ import org.junit.Test;
 import com.github.writeback.client.support.FakeOriginalRepository;
 import com.github.writeback.client.support.FakeVisitationDAO;
 
-public class WriteBackClientTest {
-	private WriteBackClient sut;
+public class CoRepositoryClientTest {
+	private CoRepositoryClient sut;
 
 	private final String key = "key";
 	private CoRepository coRepository = new LocalMemoryCoRepository();
@@ -17,9 +17,9 @@ public class WriteBackClientTest {
 
 	@Test
 	public void canSelectValue() {
-		sut = new WriteBackClient(coRepository, originalRepository);
+		sut = new CoRepositoryClient(coRepository, originalRepository);
 		
-		WriteBackItem result = sut.select(key);
+		Item result = sut.selectAsInt(key);
 
 		assertThat(result, is(originalRepository.read(key)));
 	}
@@ -27,30 +27,30 @@ public class WriteBackClientTest {
 	@Test
 	public void canUpdateValue() {
 		final String newValue = "some";
-		sut = new WriteBackClient(coRepository, originalRepository);
+		sut = new CoRepositoryClient(coRepository, originalRepository);
 		
-		sut.update(new WriteBackItem(key, newValue));
+		sut.update(new Item(key, newValue));
 		
-		assertThat(sut.select(key), is(new WriteBackItem(key, newValue)));
+		assertThat(sut.selectAsString(key), is(new Item(key, newValue)));
 	}
 
 	@Test
 	public void canIncreaseValue() {
-		sut = new WriteBackClient(coRepository, originalRepository);
-		long originalValue = (Long)sut.select(key).getValue();
+		sut = new CoRepositoryClient(coRepository, originalRepository);
+		int originalValue = sut.selectAsInt(key).getValueAsInt();
 		
 		sut.increase(key);
 		
-		assertThat(sut.select(key).getValueAsLong(), is(originalValue + 1));		
+		assertThat(sut.selectAsInt(key).getValueAsInt(), is(originalValue + 1));		
 	}
 
 	@Test
 	public void canDecreaseValue() {
-		sut = new WriteBackClient(coRepository, originalRepository);
-		long originalValue = (Long)sut.select(key).getValue();
+		sut = new CoRepositoryClient(coRepository, originalRepository);
+		int originalValue = sut.selectAsInt(key).getValueAsInt();
 		
 		sut.decrease(key);
 		
-		assertThat(sut.select(key).getValueAsLong(), is(originalValue - 1));		
+		assertThat(sut.selectAsInt(key).getValueAsInt(), is(originalValue - 1));		
 	}
 }

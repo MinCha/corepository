@@ -1,7 +1,5 @@
 package com.github.writeback.client;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -21,85 +19,68 @@ import com.github.writeback.client.exception.NotNumericValueException;
  * @author Min Cha
  */
 public class LocalMemoryCoRepository implements CoRepository {
-	private Map<Object, Object> locks = new ConcurrentHashMap<Object, Object>();
-	private Map<Object, Object> items = new ConcurrentHashMap<Object, Object>();
+	private Map<String, Object> locks = new ConcurrentHashMap<String, Object>();
+	private Map<String, String> items = new ConcurrentHashMap<String, String>();
 	private HashBasedMutexProvider mutex = new HashBasedMutexProvider();
 
-	public WriteBackItem select(Object key) {
-		assertThatThereIsKey(key);
-
-		return new WriteBackItem(key, items.get(key));
-	}
-
-	public void update(WriteBackItem item) {
+	public void update(Item item) {
 		assertThatThereIsKey(item.getKey());
 
 		synchronized (mutex.get(item.getKey())) {
-			items.put(item.getKey(), item.getValue());
+			items.put(item.getKey(), item.getValueAsString());
 		}
 	}
 
-	public void increase(Object key) {
+	public void increase(String key) {
 		assertThatThereIsKey(key);
 
 		synchronized (mutex.get(key)) {
-			Object result = items.get(key);
+			String result = items.get(key);
 			long value = covertLongFrom(result);
 			value++;
-			items.put(key, value);			
+			items.put(key, String.valueOf(value));			
 		}
 	}
 
-	public void decrease(Object key) {
+	public void decrease(String key) {
 		assertThatThereIsKey(key);
 
 		synchronized (mutex.get(key)) {
-			Object result = items.get(key);
+			String result = items.get(key);
 			long value = covertLongFrom(result);
 			value--;
 	
-			items.put(key, value);
+			items.put(key, String.valueOf(value));
 		}
 	}
 
-	public void insert(WriteBackItem item) {
+	public void insert(Item item) {
 		synchronized (mutex.get(item.getKey())) {
-			items.put(item.getKey(), item.getValue());
+			items.put(item.getKey(), item.getValueAsString());
 		}
 	}
 
-	private void assertThatThereIsKey(Object key) {
+	private void assertThatThereIsKey(String key) {
 		if (items.containsKey(key) == false) {
-			throw new NonexistentKeyException("Key does not exist : " + key);
+			throw new NonexistentKeyException(key);
 		}
 	}
 
-	public boolean exists(Object key) {
+	public boolean exists(String key) {
 		return items.containsKey(key);
 	}
 
-	public List<WriteBackItem> selectAll() {
-		List<WriteBackItem> result = new ArrayList<WriteBackItem>();
-
-		for (Object each : items.keySet()) {
-			result.add(new WriteBackItem(each, items.get(each)));
-		}
-
-		return result;
-	}
-
-	private long covertLongFrom(Object result) {
+	private long covertLongFrom(String result) {
 		long value;
 		try {
-			value = (Long) result;
-		} catch (ClassCastException e) {
-			throw new NotNumericValueException("Cannot increase value : "
-					+ result);
+			value = Long.parseLong(result);
+		} catch (Exception e) {
+			throw new NotNumericValueException(result, e);
 		}
 		return value;
 	}
 
-	public boolean lock(Object key) {
+	public boolean lock(String key) {
 		if (locks.containsKey(key)) {
 			return false;
 		} else {
@@ -108,12 +89,28 @@ public class LocalMemoryCoRepository implements CoRepository {
 		}
 	}
 
-	public boolean unlock(Object key) {
+	public boolean unlock(String key) {
 		if (locks.containsKey(key)) {
 			locks.remove(key);
 			return true;
 		} else {
 			return false;
 		}
+	}
+
+	public void delete(String key) {
+		items.remove(key);
+	}
+
+	public Item selectAsString(String key) {
+		assertThatThereIsKey(key);
+
+		return new Item(key, items.get(key));
+	}
+
+	public Item selectAsInt(String key) {
+		assertThatThereIsKey(key);
+
+		return new Item(key, Integer.parseInt(items.get(key)));
 	}
 }

@@ -4,14 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FakeVisitationDAO {
-	private Map<String, Long> table = new HashMap<String, Long>();
+	private Map<String, Integer> table = new HashMap<String, Integer>();
 
-	public long selectVisitationCount(String id) {
-		Long result = table.get(id);
-		return result == null ? 0L : result;
+	public int selectVisitationCount(String id) {
+		Integer result = table.get(id);
+		return result == null ? 0 : result;
 	}
 
-	public void updateVisitionCount(Object key, long value) {
+	public void updateVisitionCount(String key, int value) {
 		table.put((String) key, value);
 	}
 }

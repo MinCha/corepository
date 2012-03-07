@@ -1,6 +1,5 @@
 package com.github.writeback.client;
 
-import java.util.List;
 
 /**
  * CoRepository, core domain object, is responsible for receiving update and
@@ -14,21 +13,23 @@ import java.util.List;
  * 
  */
 public interface CoRepository {
-	WriteBackItem select(Object key);
+	Item selectAsString(String key);
 
-	void update(WriteBackItem item);
+	Item selectAsInt(String key);
 
-	void insert(WriteBackItem item);
+	void update(Item item);
 
-	void increase(Object key);
+	void insert(Item item);
 
-	void decrease(Object key);
+	void increase(String key);
 
-	boolean exists(Object key);
+	void decrease(String key);
 
-	List<WriteBackItem> selectAll();
+	boolean exists(String key);
+
+	void delete(String key);
+
+	boolean lock(String key);
 	
-	boolean lock(Object key);
-	
-	boolean unlock(Object key);
+	boolean unlock(String key);
 }
