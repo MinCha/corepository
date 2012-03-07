@@ -1,4 +1,4 @@
-package com.github.writeback.client.support;
+package com.github.writeback.client;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;

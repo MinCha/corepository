@@ -1,6 +1,5 @@
 package com.github.writeback.client;
 
-import com.github.writeback.client.support.BaseObject;
 
 public class Item extends BaseObject {
 	private String key;
@@ -32,5 +31,13 @@ public class Item extends BaseObject {
 
 	public boolean isInteger() {
 		return integer;
+	}
+
+	public boolean isNotFound() {
+		return value == null;
+	}
+
+	public static Item withNoValue(String key) {
+		return new Item(key, null);
 	}
 }

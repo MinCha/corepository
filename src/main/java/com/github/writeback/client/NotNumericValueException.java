@@ -1,4 +1,4 @@
-package com.github.writeback.client.exception;
+package com.github.writeback.client;
 
 @SuppressWarnings("serial")
 public class NotNumericValueException extends RuntimeException {

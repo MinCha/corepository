@@ -3,9 +3,6 @@ package com.github.writeback.client;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.github.writeback.client.exception.NonExistentKeyException;
-import com.github.writeback.client.exception.NotNumericValueException;
-
 /**
  * <code>CoRepository</code> using local memory.
  * 
@@ -13,8 +10,8 @@ import com.github.writeback.client.exception.NotNumericValueException;
  * CoRepository.
  * 
  * <b>Warning!</b> In clustered environment such as web servers clustered by L4
- * switch, this class does not ensure that select method returns the
- * latest value.
+ * switch, this class does not ensure that select method returns the latest
+ * value.
  * 
  * @author Min Cha
  */
@@ -24,32 +21,26 @@ public class LocalMemoryCoRepository implements CoRepository {
 	private HashBasedMutexProvider mutex = new HashBasedMutexProvider();
 
 	public void update(Item item) {
-		assertThatThereIsKey(item.getKey());
-
 		synchronized (mutex.get(item.getKey())) {
 			items.put(item.getKey(), item.getValueAsString());
 		}
 	}
 
 	public void increase(String key) {
-		assertThatThereIsKey(key);
-
 		synchronized (mutex.get(key)) {
 			String result = items.get(key);
 			long value = covertLongFrom(result);
 			value++;
-			items.put(key, String.valueOf(value));			
+			items.put(key, String.valueOf(value));
 		}
 	}
 
 	public void decrease(String key) {
-		assertThatThereIsKey(key);
-
 		synchronized (mutex.get(key)) {
 			String result = items.get(key);
 			long value = covertLongFrom(result);
 			value--;
-	
+
 			items.put(key, String.valueOf(value));
 		}
 	}
@@ -57,12 +48,6 @@ public class LocalMemoryCoRepository implements CoRepository {
 	public void insert(Item item) {
 		synchronized (mutex.get(item.getKey())) {
 			items.put(item.getKey(), item.getValueAsString());
-		}
-	}
-
-	private void assertThatThereIsKey(String key) {
-		if (items.containsKey(key) == false) {
-			throw new NonExistentKeyException(key);
 		}
 	}
 
@@ -103,14 +88,15 @@ public class LocalMemoryCoRepository implements CoRepository {
 	}
 
 	public Item selectAsString(String key) {
-		assertThatThereIsKey(key);
-
 		return new Item(key, items.get(key));
 	}
 
 	public Item selectAsInt(String key) {
-		assertThatThereIsKey(key);
+		if (items.containsKey(key)) {
+			return new Item(key, Integer.parseInt(items.get(key)));
+		} else {
+			return Item.withNoValue(key);
+		}
 
-		return new Item(key, Integer.parseInt(items.get(key)));
 	}
 }

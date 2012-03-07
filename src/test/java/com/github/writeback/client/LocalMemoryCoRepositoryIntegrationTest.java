@@ -5,10 +5,9 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import com.github.writeback.client.exception.NotNumericValueException;
 
 
-public class LocalMemoryCoRepositoryTest extends CoRepositoryAcceptanceTest {
+public class LocalMemoryCoRepositoryIntegrationTest extends CoRepositoryAcceptanceTest {
 	@Test
 	public void canSaveAtLeastOneMillionItems() {
 		final String keyPrefix = "domain key is ";
