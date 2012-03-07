@@ -23,7 +23,6 @@ import com.github.writeback.client.support.FakeVisitationDAO;
  * @author Min Cha
  *
  */
-//TODO key-lock이 초기부터 이미 있을 때도 정상적으로 동작해야 함
 public abstract class CoRepositoryAcceptanceTest {
 	protected CoRepository sut;
 	protected final List<CoRepositoryClient> clients = new ArrayList<CoRepositoryClient>();
