@@ -3,7 +3,7 @@ package com.github.writeback.client;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.github.writeback.client.exception.NonexistentKeyException;
+import com.github.writeback.client.exception.NonExistentKeyException;
 import com.github.writeback.client.exception.NotNumericValueException;
 
 /**
@@ -62,7 +62,7 @@ public class LocalMemoryCoRepository implements CoRepository {
 
 	private void assertThatThereIsKey(String key) {
 		if (items.containsKey(key) == false) {
-			throw new NonexistentKeyException(key);
+			throw new NonExistentKeyException(key);
 		}
 	}
 

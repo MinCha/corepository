@@ -13,7 +13,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.github.writeback.client.exception.NonexistentKeyException;
+import com.github.writeback.client.exception.NonExistentKeyException;
 import com.github.writeback.client.support.FakeOriginalRepository;
 import com.github.writeback.client.support.FakeVisitationDAO;
 
@@ -58,7 +58,7 @@ public abstract class CoRepositoryAcceptanceTest {
 		assertThat(result.getValueAsString(), is(value));
 	}
 
-	@Test(expected=NonexistentKeyException.class)
+	@Test(expected=NonExistentKeyException.class)
 	public void shouldThrowException_WhenSelectingValueWithNoKey() {
 		sut.selectAsString(noKey);
 	}
@@ -74,7 +74,7 @@ public abstract class CoRepositoryAcceptanceTest {
 		assertThat(sut.selectAsInt(key), is(new Item(key, newValue)));		
 	}
 
-	@Test(expected=NonexistentKeyException.class)
+	@Test(expected=NonExistentKeyException.class)
 	public void shouldThrowException_WhenUpdatingValueWithNoKey() {
 		final String anyValue = new String();
 		
@@ -91,7 +91,7 @@ public abstract class CoRepositoryAcceptanceTest {
 		assertThat(sut.selectAsInt(key), is(new Item(key, value + 1)));		
 	}
 
-	@Test(expected=NonexistentKeyException.class)
+	@Test(expected=NonExistentKeyException.class)
 	public void shouldThrowException_WhenIncreasingValueWithNoKey() {
 		sut.increase(noKey);
 	}
@@ -106,7 +106,7 @@ public abstract class CoRepositoryAcceptanceTest {
 		assertThat(sut.selectAsInt(key), is(new Item(key, value - 1)));		
 	}
 
-	@Test(expected=NonexistentKeyException.class)
+	@Test(expected=NonExistentKeyException.class)
 	public void shouldThrowException_WhenDecreasingValueWithNoKey() {
 		sut.decrease(noKey);
 	}

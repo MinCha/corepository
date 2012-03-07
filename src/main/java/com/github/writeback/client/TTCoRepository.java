@@ -4,7 +4,7 @@ import tokyotyrant.MRDB;
 import tokyotyrant.transcoder.IntegerTranscoder;
 import tokyotyrant.transcoder.StringTranscoder;
 
-import com.github.writeback.client.exception.NonexistentKeyException;
+import com.github.writeback.client.exception.NonExistentKeyException;
 
 public class TTCoRepository implements CoRepository {
 	static final String LOCK_KEY_PREFIX = "_CO_REPOSITORY_LOCK_FOR_";
@@ -60,7 +60,7 @@ public class TTCoRepository implements CoRepository {
 
 	private void assertThatThereIsKey(String key, Object value) {
 		if (value == null) {
-			throw new NonexistentKeyException(key);
+			throw new NonExistentKeyException(key);
 		}
 	}
 

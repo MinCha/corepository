@@ -1,8 +1,8 @@
 package com.github.writeback.client.exception;
 
 @SuppressWarnings("serial")
-public class NonexistentKeyException extends RuntimeException {
-	public NonexistentKeyException(String reason) {
+public class NonExistentKeyException extends RuntimeException {
+	public NonExistentKeyException(String reason) {
 		super("Key does not exist : " + reason);
 	}
 }
