@@ -2,8 +2,9 @@ package com.github.writeback.client;
 
 
 public class Item extends BaseObject {
-	private final static long NO_UPDATED = 0L;
-	private final static long NO_WRITEBACKED = 0L;
+	static final String META_PREFIX = "_META_";  
+	final static long NO_UPDATED = 0L;
+	final static long NO_WRITEBACKED = 0L;
 	private String key;
 	private String value;
 	private boolean integer = false;
@@ -20,8 +21,19 @@ public class Item extends BaseObject {
 		this.integer = true;
 	}
 
-	public Item(String key, String value, long updatedTime) {
-		this(key, value, updatedTime, NO_WRITEBACKED);
+	public Item(String key, int value, long lastUpdatedTime) {
+		this(key, String.valueOf(value), lastUpdatedTime, NO_WRITEBACKED);
+		this.integer = true;
+	}
+
+	public Item(String key, String value, long lastUpdatedTime) {
+		this(key, value, lastUpdatedTime, NO_WRITEBACKED);
+	}
+
+	public Item(String key, int value, long lastUpdatedTime,
+			long lastWritebackedTime) {
+		this(key, String.valueOf(value), lastUpdatedTime, NO_WRITEBACKED);
+		this.integer = true;
 	}
 
 	public Item(String key, String value, long lastUpdatedTime,

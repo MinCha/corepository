@@ -21,7 +21,6 @@ public class LocalMemoryCoRepository implements CoRepository {
 	private Map<String, Object> locks = new ConcurrentHashMap<String, Object>();
 	private Map<String, String> items = new ConcurrentHashMap<String, String>();
 	private HashBasedMutexProvider mutex = new HashBasedMutexProvider();
-	private static final String META_PREFIX = "_META_";  
 
 	public void update(Item item) {
 		synchronized (mutex.get(item.getKey())) {
@@ -99,25 +98,35 @@ public class LocalMemoryCoRepository implements CoRepository {
 		}
 		
 		String value = items.get(key);
-		if (items.containsKey(META_PREFIX + key)) {
-			String meta = items.get(META_PREFIX + key);
-			long lastUpdatedTime = Long.parseLong(meta.split("-")[0]);
-			long lastWritebackedTime = Long.parseLong(meta.split("-")[1]);
-			return new Item(key, value, lastUpdatedTime, lastWritebackedTime);
+		if (items.containsKey(Item.META_PREFIX + key)) {
+			long[] updateTimes = extractUpdatedTimes(items.get(Item.META_PREFIX + key));
+			return new Item(key, value, updateTimes[0], updateTimes[1]);
 		} else {
 			return new Item(key, value);			
 		}
 	}
 
 	public Item selectAsInt(String key) {
-		if (items.containsKey(key)) {
-			return new Item(key, Integer.parseInt(items.get(key)));
-		} else {
+		if (items.containsKey(key) == false) {
 			return Item.withNoValue(key);
+		}
+
+		int value = Integer.parseInt(items.get(key));
+		if (items.containsKey(Item.META_PREFIX + key)) {
+			long[] updateTimes = extractUpdatedTimes(items.get(Item.META_PREFIX + key));
+			return new Item(key, value, updateTimes[0], updateTimes[1]);
+		} else {
+			return new Item(key, value);			
 		}
 	}
 
 	private void updateMeta(String key) {
-		items.put(META_PREFIX + key, System.currentTimeMillis() + "-" + "0");
+		items.put(Item.META_PREFIX + key, System.currentTimeMillis() + "-" + Item.NO_WRITEBACKED);
+	}
+	
+	private long[] extractUpdatedTimes(String meta) {
+		long lastUpdatedTime = Long.parseLong(meta.split("-")[0]);
+		long lastWritebackedTime = Long.parseLong(meta.split("-")[1]);
+		return new long[]{lastUpdatedTime, lastWritebackedTime};
 	}
 }

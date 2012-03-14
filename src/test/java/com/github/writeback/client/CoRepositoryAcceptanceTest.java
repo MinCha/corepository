@@ -1,5 +1,6 @@
 package com.github.writeback.client;
 
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -36,7 +37,7 @@ public abstract class CoRepositoryAcceptanceTest {
 	protected abstract CoRepository getCoRepository() throws Exception;
 
 	@Test
-	public void canSelectNumericValue() {
+	public void canSelectIntValue() {
 		final int value = 3;
 		sut.insert(new Item(key, value));
 
@@ -47,17 +48,30 @@ public abstract class CoRepositoryAcceptanceTest {
 	}
 
 	@Test
-	public void canSelectItemWithLastUpdatedTime() {
+	public void canSelectStringValueWithLastUpdatedTime() {
 		final String value = "311";
 		final String modifiedValue = "312";
-		final long updatedTime = System.currentTimeMillis(); 
 		sut.insert(new Item(key, value));
-		sut.update(new Item(key, modifiedValue, updatedTime));
+		sut.update(new Item(key, modifiedValue));
 
 		Item result = sut.selectAsString(key);
 
 		assertThat(result.isUpdatedAfterPulling(), is(true));
-		assertThat(result.getLastUpdatedTime(), is(updatedTime));
+		assertThat(result.getLastUpdatedTime(), is(greaterThan(0L)));
+	}
+
+	@Test
+	public void canSelectIntValueWithLastUpdatedTime() {
+		final int value = 10;
+		final int modifiedValue = 12;
+		final long updatedTime = System.currentTimeMillis(); 
+		sut.insert(new Item(key, value));
+		sut.update(new Item(key, modifiedValue, updatedTime));
+
+		Item result = sut.selectAsInt(key);
+
+		assertThat(result.isUpdatedAfterPulling(), is(true));
+		assertThat(result.getLastUpdatedTime(), is(greaterThan(0L)));
 	}
 
 	@Test
@@ -99,21 +113,27 @@ public abstract class CoRepositoryAcceptanceTest {
 	public void canUpdateValue() {
 		final int value = 3;
 		final int newValue = 5;
+		final long updatedTime = System.currentTimeMillis();
 		sut.insert(new Item(key, value));
 
-		sut.update(new Item(key, newValue));
+		sut.update(new Item(key, newValue, updatedTime));
 
-		assertThat(sut.selectAsInt(key), is(new Item(key, newValue)));
+		Item result = sut.selectAsInt(key);
+		assertThat(result.getKey(), is(key));
+		assertThat(result.getValueAsInt(), is(newValue));
 	}
 
 	@Test
 	public void canIncreaseValue() {
 		final int value = 3;
-		sut.insert(new Item(key, value));
+		final long updatedTime = System.currentTimeMillis();
+		sut.insert(new Item(key, value, updatedTime));
 
 		sut.increase(key);
 
-		assertThat(sut.selectAsInt(key), is(new Item(key, value + 1)));
+		Item result = sut.selectAsInt(key);
+		assertThat(result.getKey(), is(key));
+		assertThat(result.getValueAsInt(), is(value + 1));
 	}
 
 	@Test
@@ -123,7 +143,9 @@ public abstract class CoRepositoryAcceptanceTest {
 
 		sut.decrease(key);
 
-		assertThat(sut.selectAsInt(key), is(new Item(key, value - 1)));
+		Item result = sut.selectAsInt(key);
+		assertThat(result.getKey(), is(key));
+		assertThat(result.getValueAsInt(), is(value - 1));
 	}
 
 	@Test
@@ -226,6 +248,10 @@ public abstract class CoRepositoryAcceptanceTest {
 		sut.delete(noKey);
 		sut.delete(TTCoRepository.LOCK_KEY_PREFIX + keyForLockA);
 		sut.delete(TTCoRepository.LOCK_KEY_PREFIX + keyForLockB);
+		sut.delete(Item.META_PREFIX + key);
+		sut.delete(Item.META_PREFIX + noKey);
+		sut.delete(Item.META_PREFIX + TTCoRepository.LOCK_KEY_PREFIX + keyForLockA);
+		sut.delete(Item.META_PREFIX + TTCoRepository.LOCK_KEY_PREFIX + keyForLockB);
 
 		assertThat(sut.exists(key), is(false));
 		assertThat(sut.exists(noKey), is(false));

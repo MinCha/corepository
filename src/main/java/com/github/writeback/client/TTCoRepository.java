@@ -17,6 +17,7 @@ public class TTCoRepository implements CoRepository {
 
 	public void update(Item item) {
 		insert(item);
+		updateMeta(item.getKey());
 	}
 
 	public void insert(Item item) {
@@ -31,10 +32,12 @@ public class TTCoRepository implements CoRepository {
 
 	public void increase(String key) {
 		tt.await(tt.addint(key, 1));
+		updateMeta(key);
 	}
 
 	public void decrease(String key) {
 		tt.await(tt.addint(key, -1));
+		updateMeta(key);
 	}
 
 	public boolean exists(String key) {
@@ -55,13 +58,42 @@ public class TTCoRepository implements CoRepository {
 
 	public Item selectAsString(String key) {
 		Object value = tt.await(tt.get(key, stringTranscoder));
-		return value == null ? Item.withNoValue(key) : new Item(key,
-				(String) value);
+		if (value == null) {
+			return Item.withNoValue(key);
+		}
+		
+		Object meta = tt.await(tt.get(Item.META_PREFIX + key, stringTranscoder));
+		if (meta == null) {
+			return new Item(key, (String) value);						
+		} else {
+			long[] updateTimes = extractUpdatedTimes((String) meta);
+			return new Item(key, (String)value, updateTimes[0], updateTimes[1]);
+		} 
 	}
 
 	public Item selectAsInt(String key) {
 		Object value = tt.await(tt.get(key, integerTranscoder));
-		return value == null ? Item.withNoValue(key) : new Item(key,
-				(Integer) value);
+		if (value == null) {
+			return Item.withNoValue(key);
+		}
+		
+		Object meta = tt.await(tt.get(Item.META_PREFIX + key, stringTranscoder));
+		if (meta == null) {
+			return new Item(key, (Integer) value);						
+		} else {
+			long[] updateTimes = extractUpdatedTimes((String) meta);
+			return new Item(key, (Integer)value, updateTimes[0], updateTimes[1]);
+		} 
+	}
+
+	private void updateMeta(String key) {
+		tt.await(tt.put(Item.META_PREFIX + key, System.currentTimeMillis() + "-" + Item.NO_WRITEBACKED));
+	}
+	
+	private long[] extractUpdatedTimes(String meta) {
+		meta = meta.trim();
+		long lastUpdatedTime = Long.parseLong(meta.split("-")[0]);
+		long lastWritebackedTime = Long.parseLong(meta.split("-")[1]);
+		return new long[]{lastUpdatedTime, lastWritebackedTime};
 	}
 }
