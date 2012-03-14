@@ -12,7 +12,7 @@ public class CoRepositoryClient {
 	}
 
 	public Item selectAsString(String key) {
-		puller.encurePulled(key);
+		puller.ensurePulled(key);
 		return coRepository.selectAsString(key);
 	}
 
@@ -27,17 +27,17 @@ public class CoRepositoryClient {
 	}
 
 	public void update(Item item) {
-		puller.encurePulled(item.getKey());
+		puller.ensurePulled(item.getKey());
 		coRepository.update(item);
 	}
 
 	public void increase(String key) {
-		puller.encurePulled(key);
+		puller.ensurePulled(key);
 		coRepository.increase(key);
 	}
 
 	public void decrease(String key) {
-		puller.encurePulled(key);
+		puller.ensurePulled(key);
 		coRepository.decrease(key);
 	}
 }

@@ -9,9 +9,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * If you use this class as CoRepository, you don`t need any remote
  * CoRepository.
  * 
- * <b>Warning!</b> In clustered environment such as web servers clustered by L4
+ * <b>Warning!</b> 
+ * 1. In clustered environment such as web servers clustered by L4
  * switch, this class does not ensure that select method returns the latest
  * value.
+ * 2. This CoRepository requires enough heap memory. Be careful of out of memory. 
  * 
  * @author Min Cha
  */
@@ -19,10 +21,12 @@ public class LocalMemoryCoRepository implements CoRepository {
 	private Map<String, Object> locks = new ConcurrentHashMap<String, Object>();
 	private Map<String, String> items = new ConcurrentHashMap<String, String>();
 	private HashBasedMutexProvider mutex = new HashBasedMutexProvider();
+	private static final String META_PREFIX = "_META_";  
 
 	public void update(Item item) {
 		synchronized (mutex.get(item.getKey())) {
 			items.put(item.getKey(), item.getValueAsString());
+			updateMeta(item.getKey());
 		}
 	}
 
@@ -32,6 +36,7 @@ public class LocalMemoryCoRepository implements CoRepository {
 			long value = covertLongFrom(result);
 			value++;
 			items.put(key, String.valueOf(value));
+			updateMeta(key);
 		}
 	}
 
@@ -42,6 +47,7 @@ public class LocalMemoryCoRepository implements CoRepository {
 			value--;
 
 			items.put(key, String.valueOf(value));
+			updateMeta(key);
 		}
 	}
 
@@ -88,7 +94,19 @@ public class LocalMemoryCoRepository implements CoRepository {
 	}
 
 	public Item selectAsString(String key) {
-		return new Item(key, items.get(key));
+		if (items.containsKey(key) == false) {
+			return Item.withNoValue(key);
+		}
+		
+		String value = items.get(key);
+		if (items.containsKey(META_PREFIX + key)) {
+			String meta = items.get(META_PREFIX + key);
+			long lastUpdatedTime = Long.parseLong(meta.split("-")[0]);
+			long lastWritebackedTime = Long.parseLong(meta.split("-")[1]);
+			return new Item(key, value, lastUpdatedTime, lastWritebackedTime);
+		} else {
+			return new Item(key, value);			
+		}
 	}
 
 	public Item selectAsInt(String key) {
@@ -97,6 +115,9 @@ public class LocalMemoryCoRepository implements CoRepository {
 		} else {
 			return Item.withNoValue(key);
 		}
+	}
 
+	private void updateMeta(String key) {
+		items.put(META_PREFIX + key, System.currentTimeMillis() + "-" + "0");
 	}
 }

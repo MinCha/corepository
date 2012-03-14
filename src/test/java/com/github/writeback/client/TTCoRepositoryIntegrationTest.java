@@ -1,5 +1,7 @@
 package com.github.writeback.client;
 
+import org.junit.Ignore;
+
 import tokyotyrant.MRDB;
 import tokyotyrant.networking.NodeAddress;
 
@@ -10,6 +12,7 @@ import tokyotyrant.networking.NodeAddress;
  * @author Min Cha
  * 
  */
+@Ignore
 public class TTCoRepositoryIntegrationTest extends CoRepositoryAcceptanceTest {
 	private final String ip = "192.168.0.6"; // change this before executing
 	private final int port = 1978; // change this before executing

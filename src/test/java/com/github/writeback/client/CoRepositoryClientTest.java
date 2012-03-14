@@ -11,9 +11,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CoRepositoryClientTest {
+	private final Logger log = LoggerFactory.getLogger(CoRepositoryClientTest.class);
+	
 	private CoRepositoryClient sut;
 
 	private final String key = "key";
@@ -28,6 +32,7 @@ public class CoRepositoryClientTest {
 	@Before
 	public void beforeEach() {
 		when(coRepository.lock(key)).thenReturn(true);
+		log.info("Message {} ", "Hi");
 	}
 
 	@Test

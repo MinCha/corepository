@@ -47,6 +47,30 @@ public abstract class CoRepositoryAcceptanceTest {
 	}
 
 	@Test
+	public void canSelectItemWithLastUpdatedTime() {
+		final String value = "311";
+		final String modifiedValue = "312";
+		final long updatedTime = System.currentTimeMillis(); 
+		sut.insert(new Item(key, value));
+		sut.update(new Item(key, modifiedValue, updatedTime));
+
+		Item result = sut.selectAsString(key);
+
+		assertThat(result.isUpdatedAfterPulling(), is(true));
+		assertThat(result.getLastUpdatedTime(), is(updatedTime));
+	}
+
+	@Test
+	public void canSelectItemWithLastUpdatedTime_WhenNoUpdate() {
+		final String value = "311";
+		sut.insert(new Item(key, value));
+
+		Item result = sut.selectAsString(key);
+
+		assertThat(result.isUpdatedAfterPulling(), is(false));
+	}
+
+	@Test
 	public void shouldReturnEmptyItem_WhenNoItemAsInteger() {
 		Item result = sut.selectAsInt("noKey");
 
@@ -153,7 +177,7 @@ public abstract class CoRepositoryAcceptanceTest {
 	}
 
 	@Test
-	public void mulpipleClientsCanIncreaseAndDecreaseOnSameKeyWithoutConflict()
+	public void multipleClientsCanIncreaseOrDecreaseOnSameKeyWithoutConflict()
 			throws InterruptedException {
 		final int clientCount = 50;
 		final int callCount = 300;

@@ -29,7 +29,7 @@ public class InitialValuePullerTest {
 		when(originalRepository.read(key)).thenReturn(item);
 		sut = new InitialValuePuller(coRepository, originalRepository, keyCache);
 
-		sut.encurePulled(key);
+		sut.ensurePulled(key);
 
 		verify(coRepository).insert(item);
 	}
@@ -38,7 +38,7 @@ public class InitialValuePullerTest {
 	public void shouldWaitPulling_UntilLimitedTime() {
 		sut = new InitialValuePuller(coRepository, originalRepository, keyCache);
 
-		sut.encurePulled(key);
+		sut.ensurePulled(key);
 	}
 
 	@Test(expected = NonExistentKeyException.class)
@@ -47,7 +47,7 @@ public class InitialValuePullerTest {
 		when(coRepository.lock(key)).thenReturn(true);
 		sut = new InitialValuePuller(coRepository, originalRepository, keyCache);
 
-		sut.encurePulled(key);
+		sut.ensurePulled(key);
 	}
 
 	@Test
@@ -55,7 +55,7 @@ public class InitialValuePullerTest {
 		when(keyCache.contains(key)).thenReturn(true);
 		sut = new InitialValuePuller(coRepository, originalRepository, keyCache);
 
-		sut.encurePulled(key);
+		sut.ensurePulled(key);
 
 		verifyZeroInteractions(coRepository);
 	}

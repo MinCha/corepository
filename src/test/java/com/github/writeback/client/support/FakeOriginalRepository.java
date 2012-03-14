@@ -15,7 +15,7 @@ public class FakeOriginalRepository implements OriginalRepository {
 		return new Item(key, value);
 	}
 
-	public void writeBack(Item item) {
+	public void writeback(Item item) {
 		visitationDAO.updateVisitionCount(item.getKey(), item.getValueAsInt());
 	}
 

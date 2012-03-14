@@ -24,7 +24,7 @@ public class InitialValuePuller {
 				new ConcurrentLruCache<String, Object>(1000, Long.MAX_VALUE));
 	}
 
-	public void encurePulled(String key) {
+	public void ensurePulled(String key) {
 		if (keyCache.contains(key)) {
 			return;
 		}

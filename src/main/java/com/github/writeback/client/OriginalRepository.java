@@ -15,5 +15,5 @@ package com.github.writeback.client;
 public interface OriginalRepository {
 	Item read(String key);
 
-	void writeBack(Item item);
+	void writeback(Item item);
 }
