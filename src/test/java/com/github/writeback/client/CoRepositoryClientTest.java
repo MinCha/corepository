@@ -32,7 +32,6 @@ public class CoRepositoryClientTest {
 	@Before
 	public void beforeEach() {
 		when(coRepository.lock(key)).thenReturn(true);
-		log.info("Message {} ", "Hi");
 	}
 
 	@Test

@@ -21,9 +21,9 @@ public interface CoRepository {
 
 	void insert(Item item);
 
-	void increase(String key);
+	int increase(String key);
 
-	void decrease(String key);
+	int decrease(String key);
 
 	boolean exists(String key);
 

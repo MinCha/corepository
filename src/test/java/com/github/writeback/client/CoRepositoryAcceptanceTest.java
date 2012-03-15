@@ -64,7 +64,7 @@ public abstract class CoRepositoryAcceptanceTest {
 	public void canSelectIntValueWithLastUpdatedTime() {
 		final int value = 10;
 		final int modifiedValue = 12;
-		final long updatedTime = System.currentTimeMillis(); 
+		final long updatedTime = System.currentTimeMillis();
 		sut.insert(new Item(key, value));
 		sut.update(new Item(key, modifiedValue, updatedTime));
 
@@ -200,7 +200,7 @@ public abstract class CoRepositoryAcceptanceTest {
 
 	@Test
 	public void multipleClientsCanIncreaseOrDecreaseOnSameKeyWithoutConflict()
-			throws InterruptedException {
+			throws Exception {
 		final int clientCount = 50;
 		final int callCount = 300;
 		ExecutorService executors = Executors.newFixedThreadPool(clientCount);
@@ -250,8 +250,10 @@ public abstract class CoRepositoryAcceptanceTest {
 		sut.delete(TTCoRepository.LOCK_KEY_PREFIX + keyForLockB);
 		sut.delete(Item.META_PREFIX + key);
 		sut.delete(Item.META_PREFIX + noKey);
-		sut.delete(Item.META_PREFIX + TTCoRepository.LOCK_KEY_PREFIX + keyForLockA);
-		sut.delete(Item.META_PREFIX + TTCoRepository.LOCK_KEY_PREFIX + keyForLockB);
+		sut.delete(Item.META_PREFIX + TTCoRepository.LOCK_KEY_PREFIX
+				+ keyForLockA);
+		sut.delete(Item.META_PREFIX + TTCoRepository.LOCK_KEY_PREFIX
+				+ keyForLockB);
 
 		assertThat(sut.exists(key), is(false));
 		assertThat(sut.exists(noKey), is(false));

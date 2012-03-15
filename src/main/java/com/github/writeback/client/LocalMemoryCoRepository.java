@@ -29,24 +29,25 @@ public class LocalMemoryCoRepository implements CoRepository {
 		}
 	}
 
-	public void increase(String key) {
+	public int increase(String key) {
 		synchronized (mutex.get(key)) {
 			String result = items.get(key);
-			long value = covertLongFrom(result);
+			int value = covertIntFrom(result);
 			value++;
 			items.put(key, String.valueOf(value));
 			updateMeta(key);
+			return value;
 		}
 	}
 
-	public void decrease(String key) {
+	public int decrease(String key) {
 		synchronized (mutex.get(key)) {
 			String result = items.get(key);
-			long value = covertLongFrom(result);
+			int value = covertIntFrom(result);
 			value--;
-
 			items.put(key, String.valueOf(value));
 			updateMeta(key);
+			return value;
 		}
 	}
 
@@ -60,10 +61,10 @@ public class LocalMemoryCoRepository implements CoRepository {
 		return items.containsKey(key);
 	}
 
-	private long covertLongFrom(String result) {
-		long value;
+	private int covertIntFrom(String result) {
+		int value;
 		try {
-			value = Long.parseLong(result);
+			value = Integer.parseInt(result);
 		} catch (Exception e) {
 			throw new NotNumericValueException(result, e);
 		}

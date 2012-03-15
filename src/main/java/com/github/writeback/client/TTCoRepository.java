@@ -30,14 +30,16 @@ public class TTCoRepository implements CoRepository {
 		}
 	}
 
-	public void increase(String key) {
-		tt.await(tt.addint(key, 1));
+	public int increase(String key) {
+		int result = tt.await(tt.addint(key, 1));
 		updateMeta(key);
+		return result;
 	}
 
-	public void decrease(String key) {
-		tt.await(tt.addint(key, -1));
+	public int decrease(String key) {
+		int result = tt.await(tt.addint(key, -1));
 		updateMeta(key);
+		return result;
 	}
 
 	public boolean exists(String key) {
@@ -45,7 +47,9 @@ public class TTCoRepository implements CoRepository {
 	}
 
 	public boolean lock(String key) {
-		return tt.await(tt.putkeep(LOCK_KEY_PREFIX + key, "locked"));
+		final int winner = 1;
+		int result = increase(TTCoRepository.LOCK_KEY_PREFIX + key);
+		return winner == result;
 	}
 
 	public boolean unlock(String key) {
