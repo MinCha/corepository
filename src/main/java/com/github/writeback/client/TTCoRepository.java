@@ -42,7 +42,7 @@ public class TTCoRepository implements CoRepository {
 		return result;
 	}
 
-	public boolean exists(String key) {
+	public boolean exist(String key) {
 		return tt.await(tt.get(key, new StringTranscoder())) != null;
 	}
 

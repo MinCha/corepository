@@ -57,7 +57,7 @@ public class LocalMemoryCoRepository implements CoRepository {
 		}
 	}
 
-	public boolean exists(String key) {
+	public boolean exist(String key) {
 		return items.containsKey(key);
 	}
 

@@ -29,7 +29,7 @@ public class InitialValuePuller {
 			return;
 		}
 
-		if (coRepository.exists(key)) {
+		if (coRepository.exist(key)) {
 			return;
 		}
 
@@ -60,7 +60,7 @@ public class InitialValuePuller {
 	private void waitUnitlInitialValueIsPulled(String key) {
 		int wastedTime = 0;
 		synchronized (mutex.get(key)) {
-			while (coRepository.exists(key) == false) {
+			while (coRepository.exist(key) == false) {
 				try {
 					mutex.get(key).wait(100);
 					wastedTime += 100;

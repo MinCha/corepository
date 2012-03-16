@@ -152,8 +152,8 @@ public abstract class CoRepositoryAcceptanceTest {
 	public void canKnowWhetherThereIsKey() {
 		sut.insert(new Item(key, new String("Sample")));
 
-		assertThat(sut.exists(key), is(true));
-		assertThat(sut.exists(noKey), is(false));
+		assertThat(sut.exist(key), is(true));
+		assertThat(sut.exist(noKey), is(false));
 	}
 
 	@Test
@@ -255,7 +255,7 @@ public abstract class CoRepositoryAcceptanceTest {
 		sut.delete(Item.META_PREFIX + TTCoRepository.LOCK_KEY_PREFIX
 				+ keyForLockB);
 
-		assertThat(sut.exists(key), is(false));
-		assertThat(sut.exists(noKey), is(false));
+		assertThat(sut.exist(key), is(false));
+		assertThat(sut.exist(noKey), is(false));
 	}
 }

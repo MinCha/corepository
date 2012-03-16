@@ -25,7 +25,7 @@ public interface CoRepository {
 
 	int decrease(String key);
 
-	boolean exists(String key);
+	boolean exist(String key);
 
 	void delete(String key);
 
