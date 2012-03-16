@@ -69,9 +69,8 @@ public abstract class CoRepositoryAcceptanceTest {
 	public void canSelectIntValueWithLastUpdatedTime() {
 		final int value = 10;
 		final int modifiedValue = 12;
-		final long updatedTime = System.currentTimeMillis();
 		sut.insert(new Item(key, value));
-		sut.update(new Item(key, modifiedValue, updatedTime));
+		sut.update(new Item(key, modifiedValue));
 
 		Item result = sut.selectAsInt(key);
 
@@ -118,10 +117,9 @@ public abstract class CoRepositoryAcceptanceTest {
 	public void canUpdateValue() {
 		final int value = 3;
 		final int newValue = 5;
-		final long updatedTime = System.currentTimeMillis();
 		sut.insert(new Item(key, value));
 
-		sut.update(new Item(key, newValue, updatedTime));
+		sut.update(new Item(key, newValue));
 
 		Item result = sut.selectAsInt(key);
 		assertThat(result.getKey(), is(key));
@@ -131,8 +129,7 @@ public abstract class CoRepositoryAcceptanceTest {
 	@Test
 	public void canIncreaseValue() {
 		final int value = 3;
-		final long updatedTime = System.currentTimeMillis();
-		sut.insert(new Item(key, value, updatedTime));
+		sut.insert(new Item(key, value));
 
 		sut.increase(key);
 

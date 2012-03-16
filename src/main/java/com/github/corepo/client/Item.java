@@ -21,22 +21,13 @@ public class Item extends BaseObject {
 		this.integer = true;
 	}
 
-	public Item(String key, int value, long lastUpdatedTime) {
-		this(key, String.valueOf(value), lastUpdatedTime, NO_WRITEBACKED);
-		this.integer = true;
-	}
-
-	public Item(String key, String value, long lastUpdatedTime) {
-		this(key, value, lastUpdatedTime, NO_WRITEBACKED);
-	}
-
-	public Item(String key, int value, long lastUpdatedTime,
+	Item(String key, int value, long lastUpdatedTime,
 			long lastWritebackedTime) {
 		this(key, String.valueOf(value), lastUpdatedTime, NO_WRITEBACKED);
 		this.integer = true;
 	}
 
-	public Item(String key, String value, long lastUpdatedTime,
+	Item(String key, String value, long lastUpdatedTime,
 			long lastWritebackedTime) {
 		this.key = key;
 		this.value = value;
