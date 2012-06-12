@@ -33,22 +33,21 @@ public class InitialValuePuller {
 			return;
 		}
 
-		if (coRepository.lock(key)) {
-			Item item = originalRepository.read(key);
-
-			if (item.isNotFound()) {
-				coRepository.unlock(key);
-				wakeUpAllThreadsWatingForCompletingPull(key);
-				throw new NonExistentKeyException(key);
-			} else {
-				keyCache.put(key, new Object());
-				coRepository.insert(item);
-				coRepository.unlock(key);
-				wakeUpAllThreadsWatingForCompletingPull(key);
-			}
-		} else {
+		if (coRepository.lock(key) == false) {
 			waitUnitlInitialValueIsPulled(key);
 		}
+		Item item = originalRepository.read(key);
+
+		if (item.isNotFound()) {
+			coRepository.unlock(key);
+			wakeUpAllThreadsWatingForCompletingPull(key);
+			throw new NonExistentKeyException(key);
+		} 
+		
+		keyCache.put(key, new Object());
+		coRepository.insert(item);
+		coRepository.unlock(key);
+		wakeUpAllThreadsWatingForCompletingPull(key);
 	}
 
 	private void wakeUpAllThreadsWatingForCompletingPull(Object key) {
