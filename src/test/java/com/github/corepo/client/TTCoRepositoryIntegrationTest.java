@@ -14,8 +14,8 @@ import tokyotyrant.networking.NodeAddress;
  * 
  */
 public class TTCoRepositoryIntegrationTest extends CoRepositoryAcceptanceTest {
-	private final String ip = "10.64.169.238"; // change this before executing
-	private final int port = 1978; // change this before executing
+	private final String ip = "10.64.169.238"; // change this to your ip before executing
+	private final int port = 1978; // change this to your port before executing
 
 	@Override
 	protected CoRepository getCoRepository() throws Exception {
