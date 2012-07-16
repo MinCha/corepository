@@ -1,5 +1,6 @@
 package com.github.corepo.client;
 
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertThat;
@@ -25,4 +26,13 @@ public class HashBasedMutexProviderTest {
 		assertThat(sut.get(c), is(not(sut.get(a))));
 		assertThat(sut.get(a), is(sut.get(a)));
 	}
+
+	@Test
+	public void shouldProvideLocksBySpecialKey() {
+		String key = "polygenelubricants";
+		sut = new HashBasedMutexProvider(25);
+		
+		assertThat(sut.get(key), is(notNullValue()));
+	}
+
 }
