@@ -1,6 +1,5 @@
 package com.github.corepo.client;
 
-import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -14,11 +13,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.github.corepo.client.CoRepository;
-import com.github.corepo.client.CoRepositoryClient;
-import com.github.corepo.client.Item;
-import com.github.corepo.client.OriginalRepository;
-import com.github.corepo.client.TTCoRepository;
 import com.github.corepo.client.support.FakeOriginalRepository;
 import com.github.corepo.client.support.FakeVisitationDAO;
 
@@ -53,51 +47,15 @@ public abstract class CoRepositoryAcceptanceTest {
 	}
 
 	@Test
-	public void canSelectStringValueWithLastUpdatedTime() {
-		final String value = "311";
-		final String modifiedValue = "312";
-		sut.insert(new Item(key, value));
-		sut.update(new Item(key, modifiedValue));
-
-		Item result = sut.selectAsString(key);
-
-		assertThat(result.isUpdatedAfterPulling(), is(true));
-		assertThat(result.getLastUpdatedTime(), is(greaterThan(0L)));
-	}
-
-	@Test
-	public void canSelectIntValueWithLastUpdatedTime() {
-		final int value = 10;
-		final int modifiedValue = 12;
-		sut.insert(new Item(key, value));
-		sut.update(new Item(key, modifiedValue));
-
-		Item result = sut.selectAsInt(key);
-
-		assertThat(result.isUpdatedAfterPulling(), is(true));
-		assertThat(result.getLastUpdatedTime(), is(greaterThan(0L)));
-	}
-
-	@Test
-	public void canSelectItemWithLastUpdatedTime_WhenNoUpdate() {
-		final String value = "311";
-		sut.insert(new Item(key, value));
-
-		Item result = sut.selectAsString(key);
-
-		assertThat(result.isUpdatedAfterPulling(), is(false));
-	}
-
-	@Test
 	public void shouldReturnEmptyItem_WhenNoItemAsInteger() {
-		Item result = sut.selectAsInt("noKey");
+		Item result = sut.selectAsInt(noKey);
 
 		assertThat(result.isNotFound(), is(true));
 	}
 
 	@Test
 	public void shouldReturnEmptyItem_WhenNoItemAsString() {
-		Item result = sut.selectAsString("noKey");
+		Item result = sut.selectAsString(noKey);
 
 		assertThat(result.isNotFound(), is(true));
 	}
@@ -122,6 +80,7 @@ public abstract class CoRepositoryAcceptanceTest {
 		sut.update(new Item(key, newValue));
 
 		Item result = sut.selectAsInt(key);
+		System.out.println(result);
 		assertThat(result.getKey(), is(key));
 		assertThat(result.getValueAsInt(), is(newValue));
 	}
@@ -181,11 +140,10 @@ public abstract class CoRepositoryAcceptanceTest {
 		sut.delete(key);
 		
 		assertThat(sut.exist(key), is(false));
-		assertThat(sut.exist(Item.META_PREFIX + key), is(false));
 	}
 
 	@Test
-	public void mulpipleClientsShouldShareOneCoRepositoryWithoutConflict()
+	public void multipleClientsShouldShareOneCoRepositoryWithoutConflict()
 			throws InterruptedException {
 		final int clientCount = 50;
 		final int callCount = 300;
@@ -214,19 +172,19 @@ public abstract class CoRepositoryAcceptanceTest {
 	@Test
 	public void multipleClientsCanIncreaseOrDecreaseOnSameKeyWithoutConflict()
 			throws Exception {
-		increaseAndDecreaseByMultiThreadOn(key);
+		increaseAndDecreaseByMultiThreadsOn(key);
 	}
 
 	@Test
 	public void multipleClientsCanIncreaseOrDecreaseOnNonExistingSameKeyWithoutConflict()
 			throws Exception {
-		increaseAndDecreaseByMultiThreadOn(noKey);
+		increaseAndDecreaseByMultiThreadsOn(noKey);
 	}
 
-	private void increaseAndDecreaseByMultiThreadOn(final String passedKey)
+	private void increaseAndDecreaseByMultiThreadsOn(final String passedKey)
 			throws InterruptedException {
-		final int clientCount = 50;
-		final int callCount = 300;
+		final int clientCount = 150;
+		final int callCount = 150;
 		ExecutorService executors = Executors.newFixedThreadPool(clientCount);
 
 		for (int i = 0; i < clientCount / 2; i++) {
@@ -241,6 +199,7 @@ public abstract class CoRepositoryAcceptanceTest {
 				}
 			});
 		}
+		
 		for (int i = clientCount / 2; i < clientCount; i++) {
 			final CoRepositoryClient client = new CoRepositoryClient(sut,
 					originalRepository);
@@ -273,12 +232,6 @@ public abstract class CoRepositoryAcceptanceTest {
 		sut.delete(noKey);
 		sut.delete(TTCoRepository.LOCK_KEY_PREFIX + keyForLockA);
 		sut.delete(TTCoRepository.LOCK_KEY_PREFIX + keyForLockB);
-		sut.delete(Item.META_PREFIX + key);
-		sut.delete(Item.META_PREFIX + noKey);
-		sut.delete(Item.META_PREFIX + TTCoRepository.LOCK_KEY_PREFIX
-				+ keyForLockA);
-		sut.delete(Item.META_PREFIX + TTCoRepository.LOCK_KEY_PREFIX
-				+ keyForLockB);
 
 		assertThat(sut.exist(key), is(false));
 		assertThat(sut.exist(noKey), is(false));

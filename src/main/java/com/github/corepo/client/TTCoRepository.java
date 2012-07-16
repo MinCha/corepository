@@ -17,7 +17,6 @@ public class TTCoRepository implements CoRepository {
 
 	public void update(Item item) {
 		insert(item);
-		updateMeta(item.getKey());
 	}
 
 	public void insert(Item item) {
@@ -32,13 +31,11 @@ public class TTCoRepository implements CoRepository {
 
 	public int increase(String key) {
 		int result = tt.await(tt.addint(key, 1));
-		updateMeta(key);
 		return result;
 	}
 
 	public int decrease(String key) {
 		int result = tt.await(tt.addint(key, -1));
-		updateMeta(key);
 		return result;
 	}
 
@@ -58,7 +55,6 @@ public class TTCoRepository implements CoRepository {
 
 	public void delete(String key) {
 		tt.await(tt.out(key));
-		tt.await(tt.out(Item.META_PREFIX + key));
 	}
 
 	public Item selectAsString(String key) {
@@ -66,14 +62,7 @@ public class TTCoRepository implements CoRepository {
 		if (value == null) {
 			return Item.withNoValue(key);
 		}
-		
-		Object meta = tt.await(tt.get(Item.META_PREFIX + key, stringTranscoder));
-		if (meta == null) {
-			return new Item(key, (String) value);						
-		} else {
-			long[] updateTimes = extractUpdatedTimes((String) meta);
-			return new Item(key, (String)value, updateTimes[0], updateTimes[1]);
-		} 
+		return new Item(key, (String) value);						
 	}
 
 	public Item selectAsInt(String key) {
@@ -81,24 +70,6 @@ public class TTCoRepository implements CoRepository {
 		if (value == null) {
 			return Item.withNoValue(key);
 		}
-		
-		Object meta = tt.await(tt.get(Item.META_PREFIX + key, stringTranscoder));
-		if (meta == null) {
-			return new Item(key, (Integer) value);						
-		} else {
-			long[] updateTimes = extractUpdatedTimes((String) meta);
-			return new Item(key, (Integer)value, updateTimes[0], updateTimes[1]);
-		} 
-	}
-
-	private void updateMeta(String key) {
-		tt.await(tt.put(Item.META_PREFIX + key, System.currentTimeMillis() + "-" + Item.NO_WRITEBACKED));
-	}
-	
-	private long[] extractUpdatedTimes(String meta) {
-		meta = meta.trim();
-		long lastUpdatedTime = Long.parseLong(meta.split("-")[0]);
-		long lastWritebackedTime = Long.parseLong(meta.split("-")[1]);
-		return new long[]{lastUpdatedTime, lastWritebackedTime};
+		return new Item(key, (Integer) value);						
 	}
 }

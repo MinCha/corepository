@@ -29,8 +29,8 @@ public class CoRepositoryClient {
 	public void update(Item item) {
 		puller.ensurePulled(item.getKey());
 		coRepository.update(item);
-	}
 
+	}
 	public void increase(String key) {
 		puller.ensurePulled(key);
 		coRepository.increase(key);

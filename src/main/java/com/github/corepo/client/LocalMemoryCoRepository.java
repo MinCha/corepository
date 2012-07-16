@@ -25,7 +25,6 @@ public class LocalMemoryCoRepository implements CoRepository {
 	public void update(Item item) {
 		synchronized (mutex.get(item.getKey())) {
 			items.put(item.getKey(), item.getValueAsString());
-			updateMeta(item.getKey());
 		}
 	}
 
@@ -35,7 +34,6 @@ public class LocalMemoryCoRepository implements CoRepository {
 			int value = covertIntFrom(result);
 			value++;
 			items.put(key, String.valueOf(value));
-			updateMeta(key);
 			return value;
 		}
 	}
@@ -46,7 +44,6 @@ public class LocalMemoryCoRepository implements CoRepository {
 			int value = covertIntFrom(result);
 			value--;
 			items.put(key, String.valueOf(value));
-			updateMeta(key);
 			return value;
 		}
 	}
@@ -91,7 +88,6 @@ public class LocalMemoryCoRepository implements CoRepository {
 
 	public void delete(String key) {
 		items.remove(key);
-		items.remove(Item.META_PREFIX + key);
 	}
 
 	public Item selectAsString(String key) {
@@ -100,12 +96,7 @@ public class LocalMemoryCoRepository implements CoRepository {
 		}
 		
 		String value = items.get(key);
-		if (items.containsKey(Item.META_PREFIX + key)) {
-			long[] updateTimes = extractUpdatedTimes(items.get(Item.META_PREFIX + key));
-			return new Item(key, value, updateTimes[0], updateTimes[1]);
-		} else {
-			return new Item(key, value);			
-		}
+		return new Item(key, value);			
 	}
 
 	public Item selectAsInt(String key) {
@@ -114,21 +105,6 @@ public class LocalMemoryCoRepository implements CoRepository {
 		}
 
 		int value = Integer.parseInt(items.get(key));
-		if (items.containsKey(Item.META_PREFIX + key)) {
-			long[] updateTimes = extractUpdatedTimes(items.get(Item.META_PREFIX + key));
-			return new Item(key, value, updateTimes[0], updateTimes[1]);
-		} else {
-			return new Item(key, value);			
-		}
-	}
-
-	private void updateMeta(String key) {
-		items.put(Item.META_PREFIX + key, System.currentTimeMillis() + "-" + Item.NO_WRITEBACKED);
-	}
-	
-	private long[] extractUpdatedTimes(String meta) {
-		long lastUpdatedTime = Long.parseLong(meta.split("-")[0]);
-		long lastWritebackedTime = Long.parseLong(meta.split("-")[1]);
-		return new long[]{lastUpdatedTime, lastWritebackedTime};
+		return new Item(key, value);			
 	}
 }

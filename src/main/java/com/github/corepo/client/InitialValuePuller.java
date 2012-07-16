@@ -1,9 +1,13 @@
 package com.github.corepo.client;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.code.simplelrucache.ConcurrentLruCache;
 import com.google.code.simplelrucache.LruCache;
 
 public class InitialValuePuller {
+	private final static Logger LOG = LoggerFactory.getLogger(InitialValuePuller.class);
 	private LruCache<String, Object> keyCache;
 	private HashBasedMutexProvider mutex = new HashBasedMutexProvider();
 	private CoRepository coRepository;
@@ -34,10 +38,11 @@ public class InitialValuePuller {
 		}
 
 		if (coRepository.lock(key) == false) {
-			waitUnitlInitialValueIsPulled(key);
+			waitUntilInitialValueIsPulled(key);
+			return;
 		}
+		LOG.info("Lock acquired : " + key);
 		Item item = originalRepository.read(key);
-
 		if (item.isNotFound()) {
 			coRepository.unlock(key);
 			wakeUpAllThreadsWatingForCompletingPull(key);
@@ -56,7 +61,7 @@ public class InitialValuePuller {
 		}
 	}
 
-	private void waitUnitlInitialValueIsPulled(String key) {
+	private void waitUntilInitialValueIsPulled(String key) {
 		int wastedTime = 0;
 		synchronized (mutex.get(key)) {
 			while (coRepository.exist(key) == false) {
