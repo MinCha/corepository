@@ -11,9 +11,9 @@ import java.util.concurrent.ConcurrentHashMap;
  * 
  * <b>Warning!</b> 
  * 1. In clustered environment such as web servers clustered by L4
- * switch, this class does not ensure that select method returns the latest
+ * switch, this class does not ensure that select method returns the recent
  * value.
- * 2. This CoRepository requires enough heap memory. Be careful of out of memory. 
+ * 2. LocalMemoryCoRepository requires enough heap memory. Be careful of out of memory. 
  * 
  * @author Min Cha
  */
