@@ -80,7 +80,6 @@ public abstract class CoRepositoryAcceptanceTest {
 		sut.update(new Item(key, newValue));
 
 		Item result = sut.selectAsInt(key);
-		System.out.println(result);
 		assertThat(result.getKey(), is(key));
 		assertThat(result.getValueAsInt(), is(newValue));
 	}
