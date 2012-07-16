@@ -4,19 +4,30 @@ public class CoRepositoryClient {
 	private CoRepository coRepository;
 	private LRUKeyUpdateTime keyUpdateTime;
 	private InitialValuePuller puller;
+	private TimeBasedWriteback timeBasedWriteback;
 
-	public CoRepositoryClient(CoRepository coRepository,
-			OriginalRepository originalRepository, LRUKeyUpdateTime keyUpdateTime) {
+	CoRepositoryClient(CoRepository coRepository,
+			OriginalRepository originalRepository,
+			LRUKeyUpdateTime keyUpdateTime, int writebackPeriodInMillis) {
 		this.coRepository = coRepository;
-		this.keyUpdateTime = keyUpdateTime;		
+		this.keyUpdateTime = keyUpdateTime;
 		this.puller = new InitialValuePuller(coRepository, originalRepository,
 				keyUpdateTime);
+		timeBasedWriteback = new TimeBasedWriteback(keyUpdateTime,
+				originalRepository, coRepository, writebackPeriodInMillis);
+		timeBasedWriteback.start();
+	}
+
+	public CoRepositoryClient(CoRepository coRepository,
+			OriginalRepository originalRepository, int writebackPeriodInMillis) {
+		this(coRepository, originalRepository,
+				new LRUKeyUpdateTime(new WritebackRemovalListener(coRepository,
+						originalRepository)), writebackPeriodInMillis);
 	}
 
 	public CoRepositoryClient(CoRepository coRepository,
 			OriginalRepository originalRepository) {
-		this(coRepository, originalRepository, new LRUKeyUpdateTime(new WritebackRemovalListner(
-				coRepository, originalRepository)));
+		this(coRepository, originalRepository, 1000 * 60 * 5);
 	}
 
 	public Item selectAsString(String key) {

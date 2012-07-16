@@ -65,7 +65,7 @@ public class CoRepositoryClientTest {
 	@Test
 	public void canUpdateValue() {
 		when(originalRepository.read(key)).thenReturn(integerItem);
-		sut = new CoRepositoryClient(coRepository, originalRepository, keyUpdateTime);
+		sut = new CoRepositoryClient(coRepository, originalRepository, keyUpdateTime, 1);
 
 		sut.update(stringItem);
 
@@ -76,7 +76,7 @@ public class CoRepositoryClientTest {
 	@Test
 	public void canIncreaseValue() {
 		when(originalRepository.read(key)).thenReturn(integerItem);
-		sut = new CoRepositoryClient(coRepository, originalRepository, keyUpdateTime);
+		sut = new CoRepositoryClient(coRepository, originalRepository, keyUpdateTime, 1);
 
 		sut.increase(key);
 
@@ -87,7 +87,7 @@ public class CoRepositoryClientTest {
 	@Test
 	public void canDecreaseValue() {
 		when(originalRepository.read(key)).thenReturn(integerItem);
-		sut = new CoRepositoryClient(coRepository, originalRepository, keyUpdateTime);
+		sut = new CoRepositoryClient(coRepository, originalRepository, keyUpdateTime, 1);
 
 		sut.decrease(key);
 
