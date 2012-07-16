@@ -29,10 +29,10 @@ public class HashBasedMutexProviderTest {
 
 	@Test
 	public void shouldProvideLocksBySpecialKey() {
+		final int lockCount = 25; 
 		String key = "polygenelubricants";
-		sut = new HashBasedMutexProvider(25);
+		sut = new HashBasedMutexProvider(lockCount);
 		
 		assertThat(sut.get(key), is(notNullValue()));
 	}
-
 }
