@@ -72,4 +72,13 @@ public class TTCoRepository implements CoRepository {
 		}
 		return new Item(key, (Integer) value);						
 	}
+
+	public boolean isInt(String key) {
+		try {
+			selectAsInt(key);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
 }

@@ -169,6 +169,18 @@ public abstract class CoRepositoryAcceptanceTest {
 	}
 
 	@Test
+	public void canKnowWhetherKeyTypeIsIntegerOrNot()
+			throws Exception {
+		final String intKey = "int";
+		final String stringKey = "string";
+		sut.insert(new Item(intKey, 1));
+		sut.insert(new Item("string", "value"));
+		
+		assertThat(sut.isInt(intKey), is(true));
+		assertThat(sut.isInt(stringKey), is(false));
+	}
+
+	@Test
 	public void multipleClientsCanIncreaseOrDecreaseOnSameKeyWithoutConflict()
 			throws Exception {
 		increaseAndDecreaseByMultiThreadsOn(key);

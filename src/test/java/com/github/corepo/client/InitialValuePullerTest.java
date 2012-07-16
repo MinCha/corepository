@@ -9,14 +9,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.github.corepo.client.CoRepository;
-import com.github.corepo.client.InitialValuePuller;
-import com.github.corepo.client.Item;
-import com.github.corepo.client.NonExistentKeyException;
-import com.github.corepo.client.OriginalRepository;
-import com.github.corepo.client.TimeoutException;
-import com.google.code.simplelrucache.LruCache;
-
 @RunWith(MockitoJUnitRunner.class)
 public class InitialValuePullerTest {
 	private InitialValuePuller sut;
@@ -26,14 +18,14 @@ public class InitialValuePullerTest {
 	@Mock
 	private OriginalRepository originalRepository;
 	@Mock
-	private LruCache<String, Object> keyCache;
+	private LRUKeyUpdateTime keyUpdateTime;
 
 	@Test
 	public void initialValueShouldBePulledToCoRepository() {
 		Item item = new Item(key, "anyValue");
 		when(coRepository.lock(key)).thenReturn(true);
 		when(originalRepository.read(key)).thenReturn(item);
-		sut = new InitialValuePuller(coRepository, originalRepository, keyCache);
+		sut = new InitialValuePuller(coRepository, originalRepository, keyUpdateTime);
 
 		sut.ensurePulled(key);
 
@@ -42,7 +34,7 @@ public class InitialValuePullerTest {
 
 	@Test(expected = TimeoutException.class)
 	public void shouldWaitPulling_UntilLimitedTime() {
-		sut = new InitialValuePuller(coRepository, originalRepository, keyCache);
+		sut = new InitialValuePuller(coRepository, originalRepository, keyUpdateTime);
 
 		sut.ensurePulled(key);
 	}
@@ -51,15 +43,15 @@ public class InitialValuePullerTest {
 	public void shouldThrowException_WhenThereIsNoKeyOnOriginalRepository() {
 		when(originalRepository.read(key)).thenReturn(Item.withNoValue(key));
 		when(coRepository.lock(key)).thenReturn(true);
-		sut = new InitialValuePuller(coRepository, originalRepository, keyCache);
+		sut = new InitialValuePuller(coRepository, originalRepository, keyUpdateTime);
 
 		sut.ensurePulled(key);
 	}
 
 	@Test
 	public void onceUserKeyShouldBeCached() {
-		when(keyCache.contains(key)).thenReturn(true);
-		sut = new InitialValuePuller(coRepository, originalRepository, keyCache);
+		when(keyUpdateTime.exists(key)).thenReturn(true);
+		sut = new InitialValuePuller(coRepository, originalRepository, keyUpdateTime);
 
 		sut.ensurePulled(key);
 

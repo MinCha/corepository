@@ -1,6 +1,5 @@
 package com.github.corepo.client;
 
-
 public class CoRepositoryClient {
 	private CoRepository coRepository;
 	private InitialValuePuller puller;
@@ -8,7 +7,8 @@ public class CoRepositoryClient {
 	public CoRepositoryClient(CoRepository coRepository,
 			OriginalRepository originalRepository) {
 		this.coRepository = coRepository;
-		this.puller = new InitialValuePuller(coRepository, originalRepository);
+		this.puller = new InitialValuePuller(coRepository, originalRepository,
+				new LRUKeyUpdateTime(new WritebackRemovalListner(coRepository, originalRepository)));
 	}
 
 	public Item selectAsString(String key) {
@@ -31,6 +31,7 @@ public class CoRepositoryClient {
 		coRepository.update(item);
 
 	}
+
 	public void increase(String key) {
 		puller.ensurePulled(key);
 		coRepository.increase(key);

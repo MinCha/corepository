@@ -31,7 +31,7 @@ public class LocalMemoryCoRepository implements CoRepository {
 	public int increase(String key) {
 		synchronized (mutex.get(key)) {
 			String result = items.get(key);
-			int value = covertIntFrom(result);
+			int value = convertIntFrom(result);
 			value++;
 			items.put(key, String.valueOf(value));
 			return value;
@@ -41,7 +41,7 @@ public class LocalMemoryCoRepository implements CoRepository {
 	public int decrease(String key) {
 		synchronized (mutex.get(key)) {
 			String result = items.get(key);
-			int value = covertIntFrom(result);
+			int value = convertIntFrom(result);
 			value--;
 			items.put(key, String.valueOf(value));
 			return value;
@@ -58,7 +58,7 @@ public class LocalMemoryCoRepository implements CoRepository {
 		return items.containsKey(key);
 	}
 
-	private int covertIntFrom(String result) {
+	private int convertIntFrom(String result) {
 		int value;
 		try {
 			value = Integer.parseInt(result);
@@ -106,5 +106,14 @@ public class LocalMemoryCoRepository implements CoRepository {
 
 		int value = Integer.parseInt(items.get(key));
 		return new Item(key, value);			
+	}
+
+	public boolean isInt(String key) {
+		try {
+			selectAsInt(key);
+			return true;
+		} catch (NumberFormatException e) {
+			return false;
+		}
 	}
 }

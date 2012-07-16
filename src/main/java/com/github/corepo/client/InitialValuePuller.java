@@ -3,12 +3,10 @@ package com.github.corepo.client;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.code.simplelrucache.ConcurrentLruCache;
-import com.google.code.simplelrucache.LruCache;
-
 public class InitialValuePuller {
 	private final static Logger LOG = LoggerFactory.getLogger(InitialValuePuller.class);
-	private LruCache<String, Object> keyCache;
+	//private LruCache<String, Object> keyCache;
+	private LRUKeyUpdateTime keyUpdateTime;
 	private HashBasedMutexProvider mutex = new HashBasedMutexProvider();
 	private CoRepository coRepository;
 	private OriginalRepository originalRepository;
@@ -16,20 +14,14 @@ public class InitialValuePuller {
 
 	public InitialValuePuller(CoRepository coRepository,
 			OriginalRepository originalRepository,
-			LruCache<String, Object> keyCache) {
+			LRUKeyUpdateTime keyUpdateTime) {
 		this.coRepository = coRepository;
 		this.originalRepository = originalRepository;
-		this.keyCache = keyCache;
-	}
-
-	public InitialValuePuller(CoRepository coRepository,
-			OriginalRepository originalRepository) {
-		this(coRepository, originalRepository,
-				new ConcurrentLruCache<String, Object>(1000, Long.MAX_VALUE));
+		this.keyUpdateTime = keyUpdateTime;
 	}
 
 	public void ensurePulled(String key) {
-		if (keyCache.contains(key)) {
+		if (keyUpdateTime.exists(key)) {
 			return;
 		}
 
@@ -49,7 +41,7 @@ public class InitialValuePuller {
 			throw new NonExistentKeyException(key);
 		} 
 		
-		keyCache.put(key, new Object());
+		keyUpdateTime.notifyUpdated(key, System.currentTimeMillis());
 		coRepository.insert(item);
 		coRepository.unlock(key);
 		wakeUpAllThreadsWatingForCompletingPull(key);
