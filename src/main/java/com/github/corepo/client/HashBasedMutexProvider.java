@@ -3,8 +3,6 @@ package com.github.corepo.client;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.sun.swing.internal.plaf.metal.resources.metal;
-
 class HashBasedMutexProvider {
 	private static final int DEFAULT_DISPERSION = 1000;
 	private List<Object> mutexes = new ArrayList<Object>();
