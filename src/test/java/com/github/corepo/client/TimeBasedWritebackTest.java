@@ -29,6 +29,7 @@ public class TimeBasedWritebackTest {
 		when(keyUpdateTime.findKeysOverThan(10)).thenReturn(
 				Arrays.asList(item.getKey()));
 		when(coRepository.selectAsString(item.getKey())).thenReturn(item);
+		
 		sut.start();
 
 		Thread.sleep(10 * 5 + 10);

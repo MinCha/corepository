@@ -8,7 +8,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
 
 public class LRUKeyUpdateTime {
-	private final static long DEFAULT_SIZE = 100000;
+	private final static long DEFAULT_SIZE = 10000;
 	private Cache<String, Long> lastUpdated;
 	private Cache<String, Long> lastWritebacked;
 
