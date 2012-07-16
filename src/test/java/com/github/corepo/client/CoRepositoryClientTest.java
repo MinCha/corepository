@@ -3,6 +3,7 @@ package com.github.corepo.client;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -10,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.github.corepo.client.CoRepository;
@@ -30,6 +32,8 @@ public class CoRepositoryClientTest {
 	private CoRepository coRepository;
 	@Mock
 	private OriginalRepository originalRepository;
+	@Mock
+	private LRUKeyUpdateTime keyUpdateTime;
 
 	@Before
 	public void beforeEach() {
@@ -61,31 +65,34 @@ public class CoRepositoryClientTest {
 	@Test
 	public void canUpdateValue() {
 		when(originalRepository.read(key)).thenReturn(integerItem);
-		sut = new CoRepositoryClient(coRepository, originalRepository);
+		sut = new CoRepositoryClient(coRepository, originalRepository, keyUpdateTime);
 
 		sut.update(stringItem);
 
 		verify(coRepository).update(stringItem);
+		verify(keyUpdateTime, times(2)).notifyUpdated(Mockito.eq(key), Mockito.anyLong());
 	}
 
 	@Test
 	public void canIncreaseValue() {
 		when(originalRepository.read(key)).thenReturn(integerItem);
-		sut = new CoRepositoryClient(coRepository, originalRepository);
+		sut = new CoRepositoryClient(coRepository, originalRepository, keyUpdateTime);
 
 		sut.increase(key);
 
 		verify(coRepository).increase(key);
+		verify(keyUpdateTime, times(2)).notifyUpdated(Mockito.eq(key), Mockito.anyLong());
 	}
 
 	@Test
 	public void canDecreaseValue() {
 		when(originalRepository.read(key)).thenReturn(integerItem);
-		sut = new CoRepositoryClient(coRepository, originalRepository);
+		sut = new CoRepositoryClient(coRepository, originalRepository, keyUpdateTime);
 
 		sut.decrease(key);
 
 		verify(coRepository).decrease(key);
+		verify(keyUpdateTime, times(2)).notifyUpdated(Mockito.eq(key), Mockito.anyLong());
 	}
 
 	@Test

@@ -5,9 +5,8 @@ import org.slf4j.LoggerFactory;
 
 public class InitialValuePuller {
 	private final static Logger LOG = LoggerFactory.getLogger(InitialValuePuller.class);
-	//private LruCache<String, Object> keyCache;
-	private LRUKeyUpdateTime keyUpdateTime;
 	private HashBasedMutexProvider mutex = new HashBasedMutexProvider();
+	private LRUKeyUpdateTime keyUpdateTime;
 	private CoRepository coRepository;
 	private OriginalRepository originalRepository;
 	private long timeoutInMillis = 1000;

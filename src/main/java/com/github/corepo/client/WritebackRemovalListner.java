@@ -7,7 +7,8 @@ public class WritebackRemovalListner implements RemovalListener<String, Long> {
 	private CoRepository coRepository;
 	private OriginalRepository originalRepository;
 
-	public WritebackRemovalListner(CoRepository coRepository, OriginalRepository originalRepository) {
+	public WritebackRemovalListner(CoRepository coRepository,
+			OriginalRepository originalRepository) {
 		this.coRepository = coRepository;
 		this.originalRepository = originalRepository;
 	}
@@ -17,7 +18,7 @@ public class WritebackRemovalListner implements RemovalListener<String, Long> {
 		if (coRepository.isInt(getKey(notification))) {
 			originalRepository.writeback(coRepository.selectAsInt(key));
 		} else {
-			originalRepository.writeback(coRepository.selectAsString(key));			
+			originalRepository.writeback(coRepository.selectAsString(key));
 		}
 	}
 

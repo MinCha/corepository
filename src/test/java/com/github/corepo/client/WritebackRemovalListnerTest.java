@@ -10,11 +10,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.common.cache.RemovalNotification;
 
-
 @RunWith(MockitoJUnitRunner.class)
 public class WritebackRemovalListnerTest {
 	private WritebackRemovalListner sut;
-	
+
 	@Mock
 	private OriginalRepository originalRepository;
 	@Mock
@@ -23,7 +22,7 @@ public class WritebackRemovalListnerTest {
 	private final String key = "key";
 	private final Item intItem = new Item(key, 11);
 	private final Item stringItem = new Item(key, "some value");
-	
+
 	@Test
 	public void shouldWritebackCurrentItem_WhenItemIsStringType() {
 		sut = new WritebackRemovalListner(coRepository, originalRepository) {
@@ -34,9 +33,9 @@ public class WritebackRemovalListnerTest {
 		};
 		when(coRepository.isInt(key)).thenReturn(false);
 		when(coRepository.selectAsString(key)).thenReturn(stringItem);
-		
+
 		sut.onRemoval(notification);
-		
+
 		verify(originalRepository).writeback(stringItem);
 	}
 
@@ -50,9 +49,9 @@ public class WritebackRemovalListnerTest {
 		};
 		when(coRepository.isInt(key)).thenReturn(true);
 		when(coRepository.selectAsInt(key)).thenReturn(intItem);
-		
+
 		sut.onRemoval(notification);
-		
+
 		verify(originalRepository).writeback(intItem);
 	}
 }

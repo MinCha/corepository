@@ -1,5 +1,7 @@
 package com.github.corepo.client;
 
+import org.junit.Ignore;
+
 import com.github.corepo.client.CoRepository;
 import com.github.corepo.client.TTCoRepository;
 
@@ -13,6 +15,7 @@ import tokyotyrant.networking.NodeAddress;
  * @author Min Cha
  * 
  */
+@Ignore
 public class TTCoRepositoryIntegrationTest extends CoRepositoryAcceptanceTest {
 	private final String ip = "10.64.169.238"; // change this to your ip before executing
 	private final int port = 1978; // change this to your port before executing
