@@ -54,7 +54,7 @@ public class LocalMemoryCoRepository implements CoRepository {
 		}
 	}
 
-	public boolean exist(String key) {
+	public boolean exists(String key) {
 		return items.containsKey(key);
 	}
 
@@ -86,8 +86,8 @@ public class LocalMemoryCoRepository implements CoRepository {
 		}
 	}
 
-	public void delete(String key) {
-		items.remove(key);
+	public boolean delete(String key) {
+		return items.remove(key) != null;
 	}
 
 	public Item selectAsString(String key) {

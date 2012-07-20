@@ -1,10 +1,14 @@
 package com.github.corepo.client;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import tokyotyrant.MRDB;
 import tokyotyrant.transcoder.IntegerTranscoder;
 import tokyotyrant.transcoder.StringTranscoder;
 
 public class TTCoRepository implements CoRepository {
+	private static final Logger LOG = LoggerFactory.getLogger(TTCoRepository.class);
 	static final String LOCK_KEY_PREFIX = "_CO_REPOSITORY_LOCK_FOR_";
 	private MRDB tt;
 
@@ -39,22 +43,25 @@ public class TTCoRepository implements CoRepository {
 		return result;
 	}
 
-	public boolean exist(String key) {
+	public boolean exists(String key) {
 		return tt.await(tt.get(key, new StringTranscoder())) != null;
 	}
 
 	public boolean lock(String key) {
 		final int winner = 1;
 		int result = increase(TTCoRepository.LOCK_KEY_PREFIX + key);
+		if (winner == result) {
+			LOG.info(key + " winner");
+		} 
 		return winner == result;
 	}
 
 	public boolean unlock(String key) {
-		return tt.await(tt.out(LOCK_KEY_PREFIX + key));
+		return delete(LOCK_KEY_PREFIX + key);
 	}
 
-	public void delete(String key) {
-		tt.await(tt.out(key));
+	public boolean delete(String key) {
+		return tt.await(tt.out(key));
 	}
 
 	public Item selectAsString(String key) {

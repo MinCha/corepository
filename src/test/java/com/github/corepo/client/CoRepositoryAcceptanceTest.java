@@ -3,8 +3,6 @@ package com.github.corepo.client;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -24,14 +22,14 @@ import com.github.corepo.client.support.FakeVisitationDAO;
  */
 public abstract class CoRepositoryAcceptanceTest {
 	protected CoRepository sut;
-	protected final List<CoRepositoryClient> clients = new ArrayList<CoRepositoryClient>();
 
 	protected final OriginalRepository originalRepository = new FakeOriginalRepository(
 			new FakeVisitationDAO());
-	protected final String key = "key";
-	protected final String keyForLockA = "keyA";
-	protected final String keyForLockB = "keyB";
-	protected final String noKey = "noKey";
+	protected final String key = "key" + System.currentTimeMillis();
+	protected final String keyForLockA = "keyA" + System.currentTimeMillis();
+	protected final String keyForLockB = "keyB" + System.currentTimeMillis();
+	protected final String noKey = "noKey" + System.currentTimeMillis();
+	private int lockedCount = 0;
 
 	protected abstract CoRepository getCoRepository() throws Exception;
 
@@ -112,8 +110,8 @@ public abstract class CoRepositoryAcceptanceTest {
 	public void canKnowWhetherThereIsKey() {
 		sut.insert(new Item(key, new String("Sample")));
 
-		assertThat(sut.exist(key), is(true));
-		assertThat(sut.exist(noKey), is(false));
+		assertThat(sut.exists(key), is(true));
+		assertThat(sut.exists(noKey), is(false));
 	}
 
 	@Test
@@ -137,8 +135,8 @@ public abstract class CoRepositoryAcceptanceTest {
 		sut.increase(key);
 
 		sut.delete(key);
-		
-		assertThat(sut.exist(key), is(false));
+
+		assertThat(sut.exists(key), is(false));
 	}
 
 	@Test
@@ -146,12 +144,12 @@ public abstract class CoRepositoryAcceptanceTest {
 			throws InterruptedException {
 		final int clientCount = 50;
 		final int callCount = 300;
-		ExecutorService executors = Executors.newFixedThreadPool(clientCount);
+		ExecutorService executors = Executors
+				.newFixedThreadPool(clientCount);
 
 		for (int i = 0; i < clientCount; i++) {
 			final CoRepositoryClient client = new CoRepositoryClient(sut,
 					originalRepository);
-			clients.add(client);
 			executors.submit(new Runnable() {
 				public void run() {
 					for (int i = 0; i < callCount; i++) {
@@ -164,18 +162,17 @@ public abstract class CoRepositoryAcceptanceTest {
 		executors.awaitTermination(60, TimeUnit.SECONDS);
 
 		Thread.sleep(1000 * 5);
-		Item result = clients.get(0).selectAsInt(key);
+		Item result = sut.selectAsInt(key);
 		assertThat(result.getValueAsInt(), is(clientCount * callCount));
 	}
 
 	@Test
-	public void canKnowWhetherKeyTypeIsIntegerOrNot()
-			throws Exception {
+	public void canKnowWhetherKeyTypeIsIntegerOrNot() throws Exception {
 		final String intKey = "int";
 		final String stringKey = "string";
 		sut.insert(new Item(intKey, 1));
 		sut.insert(new Item("string", "value"));
-		
+
 		assertThat(sut.isInt(intKey), is(true));
 		assertThat(sut.isInt(stringKey), is(false));
 	}
@@ -201,24 +198,22 @@ public abstract class CoRepositoryAcceptanceTest {
 		for (int i = 0; i < clientCount / 2; i++) {
 			final CoRepositoryClient client = new CoRepositoryClient(sut,
 					originalRepository);
-			clients.add(client);
 			executors.submit(new Runnable() {
 				public void run() {
 					for (int i = 0; i < callCount; i++) {
-						client.increase(passedKey);
+						client.increase(key);
 					}
 				}
 			});
 		}
-		
+
 		for (int i = clientCount / 2; i < clientCount; i++) {
 			final CoRepositoryClient client = new CoRepositoryClient(sut,
 					originalRepository);
-			clients.add(client);
 			executors.submit(new Runnable() {
 				public void run() {
 					for (int i = 0; i < callCount; i++) {
-						client.decrease(passedKey);
+						client.decrease(key);
 					}
 				}
 			});
@@ -227,10 +222,38 @@ public abstract class CoRepositoryAcceptanceTest {
 		executors.shutdown();
 		executors.awaitTermination(60, TimeUnit.SECONDS);
 
-		Item result = clients.get(0).selectAsInt(passedKey);
+		Item result = sut.selectAsInt(key);
 		assertThat(result.getValueAsInt(), is(0));
 	}
 
+	@Test
+	public void onlyOneClientShouldAcquireLock() throws Exception {
+		for (int count = 0; count < 1; count++) {
+			final int clientCount = 100;
+			final int callCount = 100;
+			final String currentKey = key + System.currentTimeMillis();
+			ExecutorService executors = Executors.newFixedThreadPool(clientCount);
+	
+			for (int i = 0; i < clientCount; i++) {
+				executors.submit(new Runnable() {
+					public void run() {
+						for (int i = 0; i < callCount; i++) {
+							if (sut.lock(currentKey)) {
+								lockedCount++;	
+							}
+						}
+					}
+				});
+			}
+	
+			executors.shutdown();
+			executors.awaitTermination(60, TimeUnit.SECONDS);
+	
+			assertThat(lockedCount, is(1));
+			sut.unlock(currentKey);
+			lockedCount = 0;
+		}
+	}
 
 	@Before
 	public void assignCoRepository() throws Exception {
@@ -244,7 +267,7 @@ public abstract class CoRepositoryAcceptanceTest {
 		sut.delete(TTCoRepository.LOCK_KEY_PREFIX + keyForLockA);
 		sut.delete(TTCoRepository.LOCK_KEY_PREFIX + keyForLockB);
 
-		assertThat(sut.exist(key), is(false));
-		assertThat(sut.exist(noKey), is(false));
+		assertThat(sut.exists(key), is(false));
+		assertThat(sut.exists(noKey), is(false));
 	}
 }

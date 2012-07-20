@@ -24,7 +24,7 @@ public class InitialValuePuller {
 			return;
 		}
 
-		if (coRepository.exist(key)) {
+		if (coRepository.exists(key)) {
 			return;
 		}
 
@@ -32,17 +32,18 @@ public class InitialValuePuller {
 			waitUntilInitialValueIsPulled(key);
 			return;
 		}
-		LOG.info("Lock acquired : " + key);
+
+		LOG.info("Lock acquired : {}", key);
 		Item item = originalRepository.read(key);
 		if (item.isNotFound()) {
-			coRepository.unlock(key);
+			new Unlocker(coRepository).unlock(key);
 			wakeUpAllThreadsWatingForCompletingPull(key);
 			throw new NonExistentKeyException(key);
 		} 
 		
 		keyUpdateTime.notifyUpdated(key, System.currentTimeMillis());
 		coRepository.insert(item);
-		coRepository.unlock(key);
+		new Unlocker(coRepository).unlock(key);
 		wakeUpAllThreadsWatingForCompletingPull(key);
 	}
 
@@ -55,7 +56,7 @@ public class InitialValuePuller {
 	private void waitUntilInitialValueIsPulled(String key) {
 		int wastedTime = 0;
 		synchronized (mutex.get(key)) {
-			while (coRepository.exist(key) == false) {
+			while (coRepository.exists(key) == false) {
 				try {
 					mutex.get(key).wait(100);
 					wastedTime += 100;
