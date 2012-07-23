@@ -1,6 +1,5 @@
 package com.github.corepo.client;
 
-//TODO When JVM exits
 public class TimeBasedWriteback implements Runnable {
 	private OriginalRepository originalRepository;
 	private CoRepository coRepository;
