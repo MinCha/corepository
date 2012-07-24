@@ -1,50 +1,75 @@
 package com.github.corepo.client;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Unlocker {
-	private static final Logger LOG = LoggerFactory.getLogger(Unlocker.class);
+	private ArrayList<UnlockRequest> requests = new ArrayList<UnlockRequest>();
 	private CoRepository coRepository;
+	private boolean activation = true;
 
 	public Unlocker(CoRepository coRepository) {
 		this.coRepository = coRepository; 
 	}
+	
+	public void active() {
+		new Thread(new DeplayedUnlocker()).start();		
+	}
 
-	public void unlockAfter(String key, int timeInMillis) {
-		if (coRepository.exists(key) == false) {
-			return;
-		}
-		new Thread(new DeplayedUnlocker(key, timeInMillis)).start();
+	public void requestUnlock(String key) {
+		this.requestUnlock(key, 2000);
+	}
+
+	public void requestUnlock(String key, int timeInMillis) {
+		requests.add(new UnlockRequest(key, timeInMillis));
 	}
 	
 	private class DeplayedUnlocker implements Runnable {
-		private String key;
-		private int timeInMillits;
-		
-		private DeplayedUnlocker(String key, int timeInMillis) {
-			this.key = key;
-			this.timeInMillits = timeInMillis;
-		}
-		
 		public void run() {
-			try {
-				Thread.sleep(timeInMillits);
-			} catch (InterruptedException ignored) {
+			while(activation) {
+				@SuppressWarnings("unchecked")
+				List<UnlockRequest> copy = (List<UnlockRequest>) requests.clone();
+				for (UnlockRequest each : copy) {
+					if (each.isUnlockable() == false) {
+						continue;
+					}
+
+					if (coRepository.exists(each.key)) {
+						unlockWithRetry(each, 3);
+					}
+					requests.remove(each);
+				}
+
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+				}
 			}
-			
-			int retryCoun = 3;
-			for (int i = 0; i < retryCoun; i++) {
-				if (coRepository.unlock(key)) {
+		}
+
+		private void unlockWithRetry(UnlockRequest each, int retryCount) {
+			for (int i = 0; i < retryCount; i++) {
+				boolean result = coRepository.unlock(each.key);
+				if (result) {
 					return;
 				}
 			}
-			
-			LOG.error("Failed unlock '{}'", key);
 		}
 	}
-
-	public void unlock(String key) {
-		this.unlockAfter(key, 2000);
+	
+	private class UnlockRequest {
+		private String key;
+		private long requestedTime;
+		private long timeInMillis;
+		
+		private UnlockRequest(String key, long timeInMillis) {
+			this.key = key;
+			this.requestedTime = System.currentTimeMillis();
+			this.timeInMillis = timeInMillis;
+		}
+		
+		private boolean isUnlockable() {
+			return requestedTime + timeInMillis < System.currentTimeMillis();
+		}
 	}
 }

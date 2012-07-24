@@ -10,6 +10,7 @@ public class InitialValuePuller {
 	private CoRepository coRepository;
 	private OriginalRepository originalRepository;
 	private long timeoutInMillis = 1000;
+	private Unlocker unlocker; 
 
 	public InitialValuePuller(CoRepository coRepository,
 			OriginalRepository originalRepository,
@@ -17,6 +18,7 @@ public class InitialValuePuller {
 		this.coRepository = coRepository;
 		this.originalRepository = originalRepository;
 		this.keyUpdateTime = keyUpdateTime;
+		this.unlocker = new Unlocker(coRepository);
 	}
 
 	public void ensurePulled(String key) {
@@ -36,14 +38,14 @@ public class InitialValuePuller {
 		LOG.info("Lock acquired : {}", key);
 		Item item = originalRepository.read(key);
 		if (item.isNotFound()) {
-			new Unlocker(coRepository).unlock(key);
+			unlocker.requestUnlock(key);
 			wakeUpAllThreadsWatingForCompletingPull(key);
 			throw new NonExistentKeyException(key);
 		} 
 		
 		keyUpdateTime.notifyUpdated(key, System.currentTimeMillis());
 		coRepository.insert(item);
-		new Unlocker(coRepository).unlock(key);
+		unlocker.requestUnlock(key);
 		wakeUpAllThreadsWatingForCompletingPull(key);
 	}
 

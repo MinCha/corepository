@@ -19,24 +19,26 @@ public class UnlockerTest {
 	@Test
 	public void shouldUnlockAfterSpecifiedTime() throws InterruptedException {
 		sut = new Unlocker(coRepository);
+		sut.active();
 		when(coRepository.exists(key)).thenReturn(true);
 		when(coRepository.unlock(key)).thenReturn(true);
 		
-		sut.unlockAfter(key, 100);
+		sut.requestUnlock(key, 100);
 		
-		Thread.sleep(150);
+		Thread.sleep(500);
 		verify(coRepository).unlock(key);
 	}
 
 	@Test
 	public void shouldRetryWhenUnlockIsFailed() throws InterruptedException {
 		sut = new Unlocker(coRepository);
+		sut.active();
 		when(coRepository.exists(key)).thenReturn(true);
 		when(coRepository.unlock(key)).thenReturn(false);
 		
-		sut.unlockAfter(key, 10);
-		Thread.sleep(100);
+		sut.requestUnlock(key, 10);
 		
+		Thread.sleep(150);
 		verify(coRepository, atLeast(3)).unlock(key);
 	}
 }
