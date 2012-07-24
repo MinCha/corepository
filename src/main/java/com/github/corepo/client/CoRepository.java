@@ -13,7 +13,7 @@ package com.github.corepo.client;
  * 
  */
 public interface CoRepository {
-	Item selectAsString(String key);
+	Item selectAsObject(String key);
 
 	Item selectAsInt(String key);
 

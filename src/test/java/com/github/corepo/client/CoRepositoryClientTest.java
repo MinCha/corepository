@@ -43,10 +43,10 @@ public class CoRepositoryClientTest {
 	@Test
 	public void canSelectStringValue() {
 		when(originalRepository.read(key)).thenReturn(stringItem);
-		when(coRepository.selectAsString(key)).thenReturn(stringItem);
+		when(coRepository.selectAsObject(key)).thenReturn(stringItem);
 		sut = new CoRepositoryClient(coRepository, originalRepository);
 
-		Item result = sut.selectAsString(key);
+		Item result = sut.selectAsObject(key);
 
 		assertThat(result, is(stringItem));
 	}

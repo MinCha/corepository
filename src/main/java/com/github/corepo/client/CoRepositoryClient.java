@@ -30,9 +30,9 @@ public class CoRepositoryClient {
 		this(coRepository, originalRepository, 1000 * 60 * 5);
 	}
 
-	public Item selectAsString(String key) {
+	public Item selectAsObject(String key) {
 		puller.ensurePulled(key);
-		return coRepository.selectAsString(key);
+		return coRepository.selectAsObject(key);
 	}
 
 	public Item selectAsInt(String key) {

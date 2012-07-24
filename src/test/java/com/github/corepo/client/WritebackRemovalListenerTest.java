@@ -32,7 +32,7 @@ public class WritebackRemovalListenerTest {
 			}
 		};
 		when(coRepository.isInt(key)).thenReturn(false);
-		when(coRepository.selectAsString(key)).thenReturn(stringItem);
+		when(coRepository.selectAsObject(key)).thenReturn(stringItem);
 
 		sut.onRemoval(notification);
 

@@ -1,30 +1,38 @@
 package com.github.corepo.client;
 
+import java.io.Serializable;
 
-public class Item extends BaseObject {
+
+public class Item extends BaseObject implements Serializable {
+	private static final long serialVersionUID = 8494719821834512432L;
 	private String key;
-	private String value;
+	private Object value;
 	private boolean integer = false;
 	
-	public Item(String key, String value) {
+	public Item(String key, Object value) {
 		this.key = key;
 		this.value = value;
 	}
 
-	public Item(String key, int value) {
-		this(key, String.valueOf(value));
+	public Item(String key, Integer value) {
+		this.key = key;
+		this.value = value;
 		this.integer = true;
 	}
 	public String getKey() {
 		return key;
 	}
 
-	public String getValueAsString() {
+	public Object getValue() {
 		return value;
 	}
 
+	public String getValueAsString() {
+		return (String) value;
+	}
+
 	public int getValueAsInt() {
-		return Integer.parseInt(value);
+		return (Integer) value;
 	}
 
 	public boolean isInteger() {

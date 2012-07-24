@@ -38,5 +38,5 @@ public class TTCoRepositoryIntegrationTest extends CoRepositoryAcceptanceTest {
 		assertThat(tt.await(tt.ext("tcrdbput", key, "1", 1,
 				new StringTranscoder())), is(notNullValue()));
 		assertThat(tt.await(tt.get(key)), is(notNullValue()));
-	}
+	}	
 }

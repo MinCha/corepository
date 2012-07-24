@@ -9,11 +9,13 @@ public class Unlocker {
 	private boolean activation = true;
 
 	public Unlocker(CoRepository coRepository) {
-		this.coRepository = coRepository; 
+		this.coRepository = coRepository;
 	}
-	
+
 	public void active() {
-		new Thread(new DeplayedUnlocker()).start();		
+		Thread t= new Thread(new DeplayedUnlocker());
+		t.setDaemon(true);
+		t.start();
 	}
 
 	public void requestUnlock(String key) {
@@ -23,27 +25,28 @@ public class Unlocker {
 	public void requestUnlock(String key, int timeInMillis) {
 		requests.add(new UnlockRequest(key, timeInMillis));
 	}
-	
+
 	private class DeplayedUnlocker implements Runnable {
 		public void run() {
-			while(activation) {
-				@SuppressWarnings("unchecked")
-				List<UnlockRequest> copy = (List<UnlockRequest>) requests.clone();
-				for (UnlockRequest each : copy) {
-					if (each.isUnlockable() == false) {
-						continue;
+			try {
+				while (activation) {
+					@SuppressWarnings("unchecked")
+					List<UnlockRequest> copy = (List<UnlockRequest>) requests
+							.clone();
+					for (UnlockRequest each : copy) {
+						if (each.isUnlockable() == false) {
+							continue;
+						}
+
+						if (coRepository.exists(each.key)) {
+							unlockWithRetry(each, 3);
+						}
+						requests.remove(each);
 					}
 
-					if (coRepository.exists(each.key)) {
-						unlockWithRetry(each, 3);
-					}
-					requests.remove(each);
-				}
-
-				try {
 					Thread.sleep(100);
-				} catch (InterruptedException e) {
 				}
+			} catch (InterruptedException e) {
 			}
 		}
 
@@ -56,18 +59,18 @@ public class Unlocker {
 			}
 		}
 	}
-	
+
 	private class UnlockRequest {
 		private String key;
 		private long requestedTime;
 		private long timeInMillis;
-		
+
 		private UnlockRequest(String key, long timeInMillis) {
 			this.key = key;
 			this.requestedTime = System.currentTimeMillis();
 			this.timeInMillis = timeInMillis;
 		}
-		
+
 		private boolean isUnlockable() {
 			return requestedTime + timeInMillis < System.currentTimeMillis();
 		}

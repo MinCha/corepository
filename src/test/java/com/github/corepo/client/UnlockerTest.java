@@ -41,4 +41,10 @@ public class UnlockerTest {
 		Thread.sleep(150);
 		verify(coRepository, atLeast(3)).unlock(key);
 	}
+	
+	public static void main(String[] args) {
+		CoRepository coRepository = new LocalMemoryCoRepository();
+		Unlocker unlocker = new Unlocker(coRepository);
+		unlocker.active();
+	}
 }

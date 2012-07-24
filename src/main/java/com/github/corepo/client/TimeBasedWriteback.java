@@ -35,7 +35,7 @@ public class TimeBasedWriteback implements Runnable {
 					originalRepository.writeback(coRepository.selectAsInt(key));
 				} else {
 					originalRepository.writeback(coRepository
-							.selectAsString(key));
+							.selectAsObject(key));
 				}
 			}
 			try {

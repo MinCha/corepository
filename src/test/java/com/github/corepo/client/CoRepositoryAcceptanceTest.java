@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import com.github.corepo.client.support.FakeOriginalRepository;
 import com.github.corepo.client.support.FakeVisitationDAO;
+import com.github.corepo.client.support.NameAge;
 
 /**
  * At least, CoRepository implementations should pass following test-cases.
@@ -53,9 +54,20 @@ public abstract class CoRepositoryAcceptanceTest {
 
 	@Test
 	public void shouldReturnEmptyItem_WhenNoItemAsString() {
-		Item result = sut.selectAsString(noKey);
+		Item result = sut.selectAsObject(noKey);
 
 		assertThat(result.isNotFound(), is(true));
+	}
+
+	@Test
+	public void canSelectObject() {
+		NameAge nameAge = new NameAge("min", 33);
+		sut.insert(new Item(key, nameAge));
+		
+		Item item = sut.selectAsObject(key);
+
+		NameAge result = (NameAge) item.getValue();
+		assertThat(result, is(nameAge));
 	}
 
 	@Test
@@ -63,7 +75,7 @@ public abstract class CoRepositoryAcceptanceTest {
 		final String value = "311";
 		sut.insert(new Item(key, value));
 
-		Item result = sut.selectAsString(key);
+		Item result = sut.selectAsObject(key);
 
 		assertThat(result.getKey(), is(key));
 		assertThat(result.getValueAsString(), is(value));
