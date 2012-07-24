@@ -41,7 +41,14 @@ public class UnlockerTest {
 		Thread.sleep(150);
 		verify(coRepository, atLeast(3)).unlock(key);
 	}
-	
+
+	@Test(expected=IllegalStateException.class)
+	public void shouldBeActiveBeforeRequestingUnlock() throws InterruptedException {
+		sut = new Unlocker(coRepository);
+		
+		sut.requestUnlock(key, 10);
+	}
+
 	public static void main(String[] args) {
 		CoRepository coRepository = new LocalMemoryCoRepository();
 		Unlocker unlocker = new Unlocker(coRepository);

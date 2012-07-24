@@ -3,11 +3,16 @@ package com.github.corepo.client;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
 
 public class LRUKeyUpdateTime {
+	@SuppressWarnings("unused")
+	private static final Logger LOG = LoggerFactory.getLogger(LRUKeyUpdateTime.class);
 	private final static long DEFAULT_SIZE = 10000;
 	private Cache<String, Long> lastUpdated;
 	private Cache<String, Long> lastWritebacked;
@@ -56,5 +61,9 @@ public class LRUKeyUpdateTime {
 			}
 		}
 		return result;
+	}
+
+	public void removeAll() {
+		lastUpdated.invalidateAll();
 	}
 }

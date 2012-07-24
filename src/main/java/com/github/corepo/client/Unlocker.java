@@ -10,13 +10,14 @@ public class Unlocker {
 	private static final Logger LOG = LoggerFactory.getLogger(Unlocker.class);
 	private ArrayList<UnlockRequest> requests = new ArrayList<UnlockRequest>();
 	private CoRepository coRepository;
-	private boolean activation = true;
+	private boolean activation = false;
 
 	public Unlocker(CoRepository coRepository) {
 		this.coRepository = coRepository;
 	}
 
 	public void active() {
+		activation = true;
 		Thread t= new Thread(new DeplayedUnlocker());
 		t.setDaemon(true);
 		t.start();
@@ -28,6 +29,10 @@ public class Unlocker {
 	}
 
 	public void requestUnlock(String key, int timeInMillis) {
+		if (activation == false) {
+			throw new IllegalStateException("Unlocker is not active. Please run active method before call.");
+		}
+		
 		requests.add(new UnlockRequest(key, timeInMillis));
 	}
 

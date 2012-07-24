@@ -16,6 +16,7 @@ public class CoRepositoryClient {
 		timeBasedWriteback = new TimeBasedWriteback(keyUpdateTime,
 				originalRepository, coRepository, writebackPeriodInMillis);
 		timeBasedWriteback.start();
+		Runtime.getRuntime().addShutdownHook(new WritebackShutdownHook(keyUpdateTime));
 	}
 
 	public CoRepositoryClient(CoRepository coRepository,

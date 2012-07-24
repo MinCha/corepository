@@ -15,6 +15,11 @@ public class WritebackRemovalListener implements RemovalListener<String, Long> {
 
 	public void onRemoval(RemovalNotification<String, Long> notification) {
 		final String key = getKey(notification);
+		
+		if (coRepository.exists(key) == false) {
+			return;
+		}
+		
 		if (coRepository.isInt(getKey(notification))) {
 			originalRepository.writeback(coRepository.selectAsInt(key));
 		} else {

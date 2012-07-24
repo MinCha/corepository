@@ -19,6 +19,7 @@ public class InitialValuePuller {
 		this.originalRepository = originalRepository;
 		this.keyUpdateTime = keyUpdateTime;
 		this.unlocker = new Unlocker(coRepository);
+		unlocker.active();
 	}
 
 	public void ensurePulled(String key) {

@@ -3,6 +3,7 @@ package com.github.corepo.client;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.List;
@@ -56,7 +57,18 @@ public class LRUKeyUpdateTimeTest {
 		sut.notifyUpdated(keyB, System.currentTimeMillis());
 		
 		verify(removalListener).onRemoval(Mockito.any(RemovalNotification.class));
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void shouldFireRemovalEvetnt_WhenRemovingAllItems() {
+		sut = new LRUKeyUpdateTime(removalListener, 1);
+		sut.notifyUpdated(keyA, System.currentTimeMillis());
+		sut.notifyUpdated(keyA, System.currentTimeMillis());
 		
+		sut.removeAll();
+		
+		verify(removalListener, times(2)).onRemoval(Mockito.any(RemovalNotification.class));
 	}
 
 	@Test

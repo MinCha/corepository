@@ -30,6 +30,8 @@ public abstract class CoRepositoryAcceptanceTest {
 	protected final String keyForLockA = "keyA" + System.currentTimeMillis();
 	protected final String keyForLockB = "keyB" + System.currentTimeMillis();
 	protected final String noKey = "noKey" + System.currentTimeMillis();
+	protected final String intKey = "int" + System.currentTimeMillis();
+	protected final String stringKey = "string" + System.currentTimeMillis();
 	private int lockedCount = 0;
 
 	protected abstract CoRepository getCoRepository() throws Exception;
@@ -180,10 +182,8 @@ public abstract class CoRepositoryAcceptanceTest {
 
 	@Test
 	public void canKnowWhetherKeyTypeIsIntegerOrNot() throws Exception {
-		final String intKey = "int";
-		final String stringKey = "string";
 		sut.insert(new Item(intKey, 1));
-		sut.insert(new Item("string", "value"));
+		sut.insert(new Item(stringKey, "value"));
 
 		assertThat(sut.isInt(intKey), is(true));
 		assertThat(sut.isInt(stringKey), is(false));
@@ -278,8 +278,7 @@ public abstract class CoRepositoryAcceptanceTest {
 		sut.delete(noKey);
 		sut.delete(TTCoRepository.LOCK_KEY_PREFIX + keyForLockA);
 		sut.delete(TTCoRepository.LOCK_KEY_PREFIX + keyForLockB);
-
-		assertThat(sut.exists(key), is(false));
-		assertThat(sut.exists(noKey), is(false));
+		sut.delete(stringKey);
+		sut.delete(intKey);
 	}
 }

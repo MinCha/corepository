@@ -31,6 +31,7 @@ public class WritebackRemovalListenerTest {
 				return key;
 			}
 		};
+		when(coRepository.exists(key)).thenReturn(true);
 		when(coRepository.isInt(key)).thenReturn(false);
 		when(coRepository.selectAsObject(key)).thenReturn(stringItem);
 
@@ -47,6 +48,7 @@ public class WritebackRemovalListenerTest {
 				return key;
 			}
 		};
+		when(coRepository.exists(key)).thenReturn(true);
 		when(coRepository.isInt(key)).thenReturn(true);
 		when(coRepository.selectAsInt(key)).thenReturn(intItem);
 
