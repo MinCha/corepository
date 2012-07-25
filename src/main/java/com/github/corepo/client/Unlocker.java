@@ -11,6 +11,7 @@ public class Unlocker {
 	private ArrayList<UnlockRequest> requests = new ArrayList<UnlockRequest>();
 	private CoRepository coRepository;
 	private boolean activation = false;
+	private final Object lock = new Object();
 
 	public Unlocker(CoRepository coRepository) {
 		this.coRepository = coRepository;
@@ -18,7 +19,7 @@ public class Unlocker {
 
 	public void active() {
 		activation = true;
-		Thread t= new Thread(new DeplayedUnlocker());
+		Thread t = new Thread(new DeplayedUnlocker());
 		t.setDaemon(true);
 		t.start();
 		Runtime.getRuntime().addShutdownHook(new UnlockerShutdownHook());
@@ -30,9 +31,10 @@ public class Unlocker {
 
 	public void requestUnlock(String key, int timeInMillis) {
 		if (activation == false) {
-			throw new IllegalStateException("Unlocker is not active. Please run active method before call.");
+			throw new IllegalStateException(
+					"Unlocker is not active. Please run active method before call.");
 		}
-		
+
 		requests.add(new UnlockRequest(key, timeInMillis));
 	}
 
@@ -48,24 +50,31 @@ public class Unlocker {
 		}
 
 		private void unlockAllItemsOvered() {
-			@SuppressWarnings("unchecked")
-			List<UnlockRequest> copy = (List<UnlockRequest>) requests
-					.clone();
-			for (UnlockRequest each : copy) {
-				if (each.isUnlockable() == false) {
-					continue;
+			synchronized (lock) {
+				@SuppressWarnings("unchecked")
+				List<UnlockRequest> copy = (List<UnlockRequest>) requests
+						.clone();
+				for (UnlockRequest each : copy) {
+					if (each.isUnlockable() == false) {
+						continue;
+					} else {
+						if (coRepository.exists(each.key)) {
+							unlockWithRetry(each, 3);
+						}
+						requests.remove(each);
+					}
 				}
-
-				if (coRepository.exists(each.key)) {
-					unlockWithRetry(each, 3);
-				}
-				requests.remove(each);
 			}
 		}
 	}
 
 	private void unlockWithRetry(UnlockRequest each, int retryCount) {
 		for (int i = 0; i < retryCount; i++) {
+			//TODO Why null? Please, review this condition.
+			if (each == null) {
+				return;
+			}
+			
 			boolean result = coRepository.unlock(each.key);
 			if (result) {
 				return;
@@ -74,16 +83,22 @@ public class Unlocker {
 	}
 
 	private class UnlockerShutdownHook extends Thread {
+		@SuppressWarnings({ "unchecked" })
 		public void run() {
-			LOG.info("ShutdownHook Starts, wating count is " + requests.size());
-			for (UnlockRequest each : requests) {
-				unlockWithRetry(each, 3);
+			synchronized (lock) {
+				LOG.info("ShutdownHook Starts, wating count is "
+						+ requests.size());
+				List<UnlockRequest> targets = (List<UnlockRequest>) requests
+						.clone();
+				for (UnlockRequest each : targets) {
+					unlockWithRetry(each, 3);
+				}
+				LOG.info("ShutdownHook ends");
 			}
-			LOG.info("ShutdownHook ends");
 		}
 	}
 
-	private class UnlockRequest {
+	private class UnlockRequest extends BaseObject {
 		private String key;
 		private long requestedTime;
 		private long timeInMillis;

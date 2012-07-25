@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class InitialValuePuller {
+	@SuppressWarnings("unused")
 	private final static Logger LOG = LoggerFactory.getLogger(InitialValuePuller.class);
 	private HashBasedMutexProvider mutex = new HashBasedMutexProvider();
 	private LRUKeyUpdateTime keyUpdateTime;
@@ -36,7 +37,6 @@ public class InitialValuePuller {
 			return;
 		}
 
-		LOG.info("Lock acquired : {}", key);
 		Item item = originalRepository.read(key);
 		if (item.isNotFound()) {
 			unlocker.requestUnlock(key);
