@@ -77,7 +77,7 @@ public class LRUKeyUpdateTimeTest {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void shouldFireRemovalEvetnt_WhenRemovingAllItems() {
+	public void shouldFireRemovalEvent_WhenRemovingAllItems() {
 		sut = new LRUKeyUpdateTime(removalListener, 2);
 		sut.notifyUpdated(keyA, System.currentTimeMillis());
 		sut.notifyUpdated(keyB, System.currentTimeMillis());
