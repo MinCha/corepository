@@ -1,6 +1,5 @@
 package com.github.corepo.client.performance;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.github.corepo.client.CoRepository;
@@ -10,10 +9,9 @@ import com.github.corepo.client.LocalMemoryCoRepository;
 import com.github.corepo.client.support.FakeOriginalRepository;
 import com.github.corepo.client.support.FakeVisitationDAO;
 
-@Ignore
 public class CoRepositoryInsertAndSelect {
 	@Test
-	public void firstTouch_WithLock() {
+	public void firstTouch_WithLock() throws InterruptedException {
 		CoRepository coRepository = new LocalMemoryCoRepository();
 		FakeOriginalRepository fakeOriginalRepository = new FakeOriginalRepository(new FakeVisitationDAO());
 		CoRepositoryClient client = new CoRepositoryClient(coRepository, fakeOriginalRepository);

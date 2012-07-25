@@ -70,11 +70,6 @@ public class Unlocker {
 
 	private void unlockWithRetry(UnlockRequest each, int retryCount) {
 		for (int i = 0; i < retryCount; i++) {
-			//TODO Why null? Please, review this condition.
-			if (each == null) {
-				return;
-			}
-			
 			boolean result = coRepository.unlock(each.key);
 			if (result) {
 				return;
