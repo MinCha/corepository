@@ -18,7 +18,7 @@ public class WritebackRemovalListenerTest {
 	private OriginalRepository originalRepository;
 	@Mock
 	private CoRepository coRepository;
-	private RemovalNotification<String, Long> notification;
+	private RemovalNotification<String, UpdateTime> notification;
 	private final String key = "key";
 	private final Item intItem = new Item(key, 11);
 	private final Item stringItem = new Item(key, "some value");
@@ -27,7 +27,7 @@ public class WritebackRemovalListenerTest {
 	public void shouldWritebackCurrentItem_WhenItemIsStringType() {
 		sut = new WritebackRemovalListener(coRepository, originalRepository) {
 			@Override
-			String getKey(RemovalNotification<String, Long> notification) {
+			String getKey(RemovalNotification<String, UpdateTime> notification) {
 				return key;
 			}
 		};
@@ -44,7 +44,7 @@ public class WritebackRemovalListenerTest {
 	public void shouldWritebackCurrentItem_WhenItemIsIntType() {
 		sut = new WritebackRemovalListener(coRepository, originalRepository) {
 			@Override
-			String getKey(RemovalNotification<String, Long> notification) {
+			String getKey(RemovalNotification<String, UpdateTime> notification) {
 				return key;
 			}
 		};

@@ -14,29 +14,35 @@ public class LRUKeyUpdateTime {
 	@SuppressWarnings("unused")
 	private static final Logger LOG = LoggerFactory.getLogger(LRUKeyUpdateTime.class);
 	private final static long DEFAULT_SIZE = 10000;
-	private Cache<String, Long> lastUpdated;
-	private Cache<String, Long> lastWritebacked;
+	private Cache<String, UpdateTime> lastUpdated;
+	private Cache<String, UpdateTime> lastWritebacked;
 
-	public LRUKeyUpdateTime(RemovalListener<String, Long> removalListener) {
+	public LRUKeyUpdateTime(RemovalListener<String, UpdateTime> removalListener) {
 		this(removalListener, DEFAULT_SIZE);
 	}
 
-	public LRUKeyUpdateTime(RemovalListener<String, Long> removalListener, long size) {
+	public LRUKeyUpdateTime(RemovalListener<String, UpdateTime> removalListener, long size) {
 		this.lastUpdated = CacheBuilder.newBuilder().maximumSize(size)
 				.removalListener(removalListener).build();
 		this.lastWritebacked = CacheBuilder.newBuilder().maximumSize(size).build();
 	}
 
 	public void notifyUpdated(String key, long updatedTime) {
-		lastUpdated.put(key, updatedTime);
+		UpdateTime old = lastUpdated.getIfPresent(key);
+		
+		if (old == null) {
+			lastUpdated.put(key, new UpdateTime(updatedTime));
+		} else {
+			old.update(updatedTime);
+		}
 		
 		if (lastWritebacked.getIfPresent(key) == null) {
-			lastWritebacked.put(key, updatedTime);
+			lastWritebacked.put(key, new UpdateTime(updatedTime));
 		}
 	}
 
 	public void notifyWritebacked(String key, long writebackedTime) {
-		lastWritebacked.put(key, writebackedTime);
+		lastWritebacked.put(key, new UpdateTime(writebackedTime));
 	}
 
 	public boolean isUpdated(String key) {
@@ -55,8 +61,8 @@ public class LRUKeyUpdateTime {
 		List<String> result = new ArrayList<String>();
 		for (String key : lastUpdated.asMap().keySet()) {
 			long current = System.currentTimeMillis();
-			Long time = lastWritebacked.getIfPresent(key);
-			if (current - timeInMillis > time) {
+			UpdateTime time = lastWritebacked.getIfPresent(key);
+			if (current - timeInMillis > time.time()) {
 				result.add(key);
 			}
 		}
@@ -65,5 +71,9 @@ public class LRUKeyUpdateTime {
 
 	public void removeAll() {
 		lastUpdated.invalidateAll();
+	}
+	
+	long size() {
+		return lastUpdated.size();
 	}
 }

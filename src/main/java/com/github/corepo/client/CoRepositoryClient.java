@@ -37,12 +37,8 @@ public class CoRepositoryClient {
 	}
 
 	public Item selectAsInt(String key) {
+		puller.ensurePulled(key);
 		Item result = coRepository.selectAsInt(key);
-
-		if (result.isNotFound()) {
-			throw new NonExistentKeyException(key);
-		}
-
 		return result;
 	}
 

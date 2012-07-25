@@ -18,8 +18,9 @@ import tokyotyrant.transcoder.StringTranscoder;
  * @author Min Cha
  * 
  */
+@Ignore
 public class TTCoRepositoryIntegrationTest extends CoRepositoryAcceptanceTest {
-	private final String ip = "10.64.176.139"; // change this to your ip before executing
+	private final String ip = "10.64.179.242"; // change this to your ip before executing
 	private final int port = 1978; // change this to your port before executing
 	private MRDB tt;
 

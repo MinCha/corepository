@@ -24,8 +24,24 @@ public class LRUKeyUpdateTimeTest {
 	private final String keyB = "keyB";
 	private final String nokey = "nokey";
 	@Mock
-	private RemovalListener<String, Long> removalListener;
-	
+	private RemovalListener<String, UpdateTime> removalListener;
+	private int count = 0;
+
+	@Test
+	public void removalEventShouldOccurWhenOnlyRemovingItem() {
+		sut = new LRUKeyUpdateTime(new RemovalListener<String, UpdateTime>() {
+			public void onRemoval(RemovalNotification<String, UpdateTime> notification) {
+				count++;
+			}
+		});
+		
+		sut.notifyUpdated(keyA, System.currentTimeMillis());
+		sut.notifyUpdated(keyA, System.currentTimeMillis());
+		sut.notifyUpdated(keyA, System.currentTimeMillis());
+		
+		assertThat(count, is(0));
+	}
+
 	@Test
 	public void canUpdateLastUpdatedTime() {
 		sut = new LRUKeyUpdateTime(removalListener);
@@ -62,10 +78,12 @@ public class LRUKeyUpdateTimeTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void shouldFireRemovalEvetnt_WhenRemovingAllItems() {
-		sut = new LRUKeyUpdateTime(removalListener, 1);
+		sut = new LRUKeyUpdateTime(removalListener, 2);
 		sut.notifyUpdated(keyA, System.currentTimeMillis());
+		sut.notifyUpdated(keyB, System.currentTimeMillis());
 		sut.notifyUpdated(keyA, System.currentTimeMillis());
-		
+		sut.notifyUpdated(keyB, System.currentTimeMillis());
+
 		sut.removeAll();
 		
 		verify(removalListener, times(2)).onRemoval(Mockito.any(RemovalNotification.class));
