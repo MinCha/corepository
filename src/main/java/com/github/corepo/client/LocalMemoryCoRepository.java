@@ -32,7 +32,10 @@ public class LocalMemoryCoRepository implements CoRepository {
 		synchronized (mutex.get(key)) {
 			int value = 0;
 			try {
-				value = (Integer) items.get(key);;
+				Object original = items.get(key);
+				if (original != null) {
+					value = (Integer) items.get(key);					 
+				}
 			} catch (ClassCastException e) {
 				throw new NotNumericValueException();
 			}
@@ -46,7 +49,10 @@ public class LocalMemoryCoRepository implements CoRepository {
 		synchronized (mutex.get(key)) {
 			int value = 0;
 			try {
-				value = (Integer) items.get(key);;
+				Object original = items.get(key);
+				if (original != null) {
+					value = (Integer) items.get(key);					 
+				}
 			} catch (ClassCastException e) {
 				throw new NotNumericValueException();
 			}

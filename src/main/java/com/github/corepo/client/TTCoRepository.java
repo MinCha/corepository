@@ -47,7 +47,7 @@ public class TTCoRepository implements CoRepository {
 
 	public boolean lock(String key) {
 		final int winner = 1;
-		int result = increase(TTCoRepository.LOCK_KEY_PREFIX + key);
+		int result = increase(LOCK_KEY_PREFIX + key);
 		if (winner == result) {
 			LOG.info(key + " winner");
 		} 

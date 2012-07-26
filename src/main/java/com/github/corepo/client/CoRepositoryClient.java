@@ -48,15 +48,15 @@ public class CoRepositoryClient {
 		keyUpdateTime.notifyUpdated(item.getKey(), System.currentTimeMillis());
 	}
 
-	public void increase(String key) {
+	public int increase(String key) {
 		puller.ensurePulled(key);
-		coRepository.increase(key);
 		keyUpdateTime.notifyUpdated(key, System.currentTimeMillis());
+		return coRepository.increase(key);
 	}
 
-	public void decrease(String key) {
+	public int decrease(String key) {
 		puller.ensurePulled(key);
-		coRepository.decrease(key);
 		keyUpdateTime.notifyUpdated(key, System.currentTimeMillis());
+		return coRepository.decrease(key);
 	}
 }

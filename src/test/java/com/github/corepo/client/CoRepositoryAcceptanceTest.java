@@ -109,6 +109,15 @@ public abstract class CoRepositoryAcceptanceTest {
 	}
 
 	@Test
+	public void keyShouldBePutAutomatically_WhenIncreasingNonExistingKey() {
+		sut.increase(noKey);
+
+		Item result = sut.selectAsInt(noKey);
+		assertThat(result.getKey(), is(noKey));
+		assertThat(result.getValueAsInt(), is(1));
+	}
+
+	@Test
 	public void canDecreaseValue() {
 		final int value = 3;
 		sut.insert(new Item(key, value));
@@ -118,6 +127,15 @@ public abstract class CoRepositoryAcceptanceTest {
 		Item result = sut.selectAsInt(key);
 		assertThat(result.getKey(), is(key));
 		assertThat(result.getValueAsInt(), is(value - 1));
+	}
+
+	@Test
+	public void keyShouldBePutAutomatically_WhenDecreasingNonExistingKey() {
+		sut.decrease(noKey);
+
+		Item result = sut.selectAsInt(noKey);
+		assertThat(result.getKey(), is(noKey));
+		assertThat(result.getValueAsInt(), is(-1));
 	}
 
 	@Test
@@ -177,6 +195,7 @@ public abstract class CoRepositoryAcceptanceTest {
 
 		Thread.sleep(1000 * 5);
 		Item result = sut.selectAsInt(key);
+		assertThat(result.isNotFound(), is(false));
 		assertThat(result.getValueAsInt(), is(clientCount * callCount));
 	}
 
