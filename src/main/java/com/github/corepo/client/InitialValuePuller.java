@@ -57,14 +57,14 @@ public class InitialValuePuller {
 	}
 
 	private void waitUntilInitialValueIsPulled(String key) {
-		int wastedTime = 0;
+		int waitingTime = 0;
 		synchronized (mutex.get(key)) {
 			while (coRepository.exists(key) == false) {
 				try {
 					mutex.get(key).wait(100);
-					wastedTime += 100;
+					waitingTime += 100;
 
-					if (wastedTime > timeoutInMillis) {
+					if (waitingTime > timeoutInMillis) {
 						throw new TimeoutException(key);
 					}
 				} catch (InterruptedException e) {
