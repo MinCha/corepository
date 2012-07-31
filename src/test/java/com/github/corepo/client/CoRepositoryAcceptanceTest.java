@@ -11,9 +11,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.github.corepo.client.support.FakeOriginalRepository;
-import com.github.corepo.client.support.FakeVisitationDAO;
-import com.github.corepo.client.support.NameAge;
+import com.github.corepo.client.measurement.support.FakeOriginalRepository;
+import com.github.corepo.client.measurement.support.FakeVisitationDAO;
+import com.github.corepo.client.measurement.support.NameAge;
 
 /**
  * At least, CoRepository implementations should pass following test-cases.

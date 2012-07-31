@@ -1,6 +1,6 @@
 package com.github.corepo.client;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 public class Unlocker {
 	private static final Logger LOG = LoggerFactory.getLogger(Unlocker.class);
-	private ArrayList<UnlockRequest> requests = new ArrayList<UnlockRequest>();
+	private LinkedList<UnlockRequest> requests = new LinkedList<UnlockRequest>();
 	private CoRepository coRepository;
 	private boolean activation = false;
 	private final Object lock = new Object();

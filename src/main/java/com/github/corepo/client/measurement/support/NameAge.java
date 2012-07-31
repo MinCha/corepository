@@ -1,4 +1,4 @@
-package com.github.corepo.client.support;
+package com.github.corepo.client.measurement.support;
 
 import java.io.Serializable;
 

@@ -5,8 +5,8 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import com.github.corepo.client.support.FakeOriginalRepository;
-import com.github.corepo.client.support.FakeVisitationDAO;
+import com.github.corepo.client.measurement.support.FakeOriginalRepository;
+import com.github.corepo.client.measurement.support.FakeVisitationDAO;
 
 public class CoRepositoryEndToEndTest {
 	private final String key = "count";
