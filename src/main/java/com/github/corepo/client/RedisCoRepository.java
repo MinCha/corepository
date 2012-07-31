@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 
 import com.google.common.primitives.Ints;
 
@@ -17,6 +18,12 @@ public class RedisCoRepository implements CoRepository {
 	private static final Logger LOG = LoggerFactory.getLogger(RedisCoRepository.class);
 	private static final String LOCK_KEY_PREFIX = "_CO_REPOSITORY_LOCK_FOR_";
 	private JedisPool jedisPool;
+
+	public RedisCoRepository(String host, int port) {
+		JedisPoolConfig config = new JedisPoolConfig();
+		config.setMaxActive(100);
+		this.jedisPool = new JedisPool(config, host, port);
+	}
 
 	public RedisCoRepository(JedisPool jedis) {
 		this.jedisPool = jedis;

@@ -5,13 +5,14 @@ import org.slf4j.LoggerFactory;
 
 public class InitialValuePuller {
 	@SuppressWarnings("unused")
-	private final static Logger LOG = LoggerFactory.getLogger(InitialValuePuller.class);
+	private final static Logger LOG = LoggerFactory
+			.getLogger(InitialValuePuller.class);
 	private HashBasedMutexProvider mutex = new HashBasedMutexProvider();
 	private LRUKeyUpdateTime keyUpdateTime;
 	private CoRepository coRepository;
 	private OriginalRepository originalRepository;
 	private long timeoutInMillis = 1000;
-	private Unlocker unlocker; 
+	private Unlocker unlocker;
 
 	public InitialValuePuller(CoRepository coRepository,
 			OriginalRepository originalRepository,
@@ -42,8 +43,8 @@ public class InitialValuePuller {
 			unlocker.requestUnlock(key);
 			wakeUpAllThreadsWatingForCompletingPull(key);
 			throw new NonExistentKeyException(key);
-		} 
-		
+		}
+
 		keyUpdateTime.notifyUpdated(key, System.currentTimeMillis());
 		coRepository.insert(item);
 		unlocker.requestUnlock(key);
@@ -61,12 +62,15 @@ public class InitialValuePuller {
 		synchronized (mutex.get(key)) {
 			while (coRepository.exists(key) == false) {
 				try {
-					mutex.get(key).wait(100);
 					waitingTime += 100;
 
 					if (waitingTime > timeoutInMillis) {
-						throw new TimeoutException(key);
+						throw new TimeoutException(
+								"Waited so long or key does`t exist on OriginalRepository. Key is "
+										+ key);
 					}
+
+					mutex.get(key).wait(100);
 				} catch (InterruptedException e) {
 				}
 			}

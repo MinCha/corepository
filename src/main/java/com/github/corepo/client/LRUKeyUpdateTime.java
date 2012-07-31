@@ -12,7 +12,8 @@ import com.google.common.cache.RemovalListener;
 
 public class LRUKeyUpdateTime {
 	@SuppressWarnings("unused")
-	private static final Logger LOG = LoggerFactory.getLogger(LRUKeyUpdateTime.class);
+	private static final Logger LOG = LoggerFactory
+			.getLogger(LRUKeyUpdateTime.class);
 	private final static long DEFAULT_SIZE = 10000;
 	private Cache<String, UpdateTime> lastUpdated;
 	private Cache<String, UpdateTime> lastWritebacked;
@@ -21,23 +22,26 @@ public class LRUKeyUpdateTime {
 		this(removalListener, DEFAULT_SIZE);
 	}
 
-	public LRUKeyUpdateTime(RemovalListener<String, UpdateTime> removalListener, long size) {
+	public LRUKeyUpdateTime(
+			RemovalListener<String, UpdateTime> removalListener, long size) {
 		this.lastUpdated = CacheBuilder.newBuilder().maximumSize(size)
 				.removalListener(removalListener).build();
-		this.lastWritebacked = CacheBuilder.newBuilder().maximumSize(size).build();
+		this.lastWritebacked = CacheBuilder.newBuilder().maximumSize(size)
+				.build();
 	}
 
 	public void notifyUpdated(String key, long updatedTime) {
 		UpdateTime old = lastUpdated.getIfPresent(key);
-		
+
 		if (old == null) {
 			lastUpdated.put(key, new UpdateTime(updatedTime));
 		} else {
 			old.update(updatedTime);
 		}
-		
+
 		if (lastWritebacked.getIfPresent(key) == null) {
-			lastWritebacked.put(key, new UpdateTime(updatedTime));
+			final long extra = 100;
+			lastWritebacked.put(key, new UpdateTime(updatedTime - extra));
 		}
 	}
 
@@ -52,7 +56,7 @@ public class LRUKeyUpdateTime {
 	public boolean isWritebacked(String key) {
 		return lastWritebacked.getIfPresent(key) != null;
 	}
-	
+
 	public boolean exists(String key) {
 		return isUpdated(key);
 	}
@@ -61,8 +65,10 @@ public class LRUKeyUpdateTime {
 		List<String> result = new ArrayList<String>();
 		for (String key : lastUpdated.asMap().keySet()) {
 			long current = System.currentTimeMillis();
-			UpdateTime time = lastWritebacked.getIfPresent(key);
-			if (current - timeInMillis > time.time()) {
+			UpdateTime writebackedTime = lastWritebacked.getIfPresent(key);
+			UpdateTime updateedTime = lastUpdated.getIfPresent(key);
+			if (current - timeInMillis > writebackedTime.time()
+					&& updateedTime.time() > writebackedTime.time()) {
 				result.add(key);
 			}
 		}
@@ -72,7 +78,7 @@ public class LRUKeyUpdateTime {
 	public void removeAll() {
 		lastUpdated.invalidateAll();
 	}
-	
+
 	long size() {
 		return lastUpdated.size();
 	}

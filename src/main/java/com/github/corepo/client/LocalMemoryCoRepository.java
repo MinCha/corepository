@@ -9,11 +9,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * If you use this class as CoRepository, you don`t need any remote
  * CoRepository.
  * 
- * <b>Warning!</b> 
- * 1. In clustered environment such as web servers clustered by L4
- * switch, this class does not ensure that select method returns the recent
- * value.
- * 2. LocalMemoryCoRepository requires enough heap memory. Be careful of out of memory. 
+ * <b>Warning!</b> 1. In clustered environment such as web servers clustered by
+ * L4 switch, this class does not ensure that select method returns the recent
+ * value. 2. LocalMemoryCoRepository requires enough heap memory. Be careful of
+ * out of memory.
  * 
  * @author Min Cha
  */
@@ -34,7 +33,7 @@ public class LocalMemoryCoRepository implements CoRepository {
 			try {
 				Object original = items.get(key);
 				if (original != null) {
-					value = (Integer) items.get(key);					 
+					value = (Integer) items.get(key);
 				}
 			} catch (ClassCastException e) {
 				throw new NotNumericValueException();
@@ -51,7 +50,7 @@ public class LocalMemoryCoRepository implements CoRepository {
 			try {
 				Object original = items.get(key);
 				if (original != null) {
-					value = (Integer) items.get(key);					 
+					value = (Integer) items.get(key);
 				}
 			} catch (ClassCastException e) {
 				throw new NotNumericValueException();
@@ -84,11 +83,13 @@ public class LocalMemoryCoRepository implements CoRepository {
 	}
 
 	public boolean lock(String key) {
-		if (locks.containsKey(key)) {
-			return false;
-		} else {
-			locks.put(key, new Object());
-			return true;
+		synchronized (mutex.get(key)) {
+			if (locks.containsKey(key)) {
+				return false;
+			} else {
+				locks.put(key, new Object());
+				return true;
+			}
 		}
 	}
 
@@ -109,8 +110,8 @@ public class LocalMemoryCoRepository implements CoRepository {
 		if (items.containsKey(key) == false) {
 			return Item.withNoValue(key);
 		}
-		
-		return new Item(key, items.get(key));			
+
+		return new Item(key, items.get(key));
 	}
 
 	public Item selectAsInt(String key) {
@@ -119,7 +120,7 @@ public class LocalMemoryCoRepository implements CoRepository {
 		}
 
 		int value = (Integer) items.get(key);
-		return new Item(key, value);			
+		return new Item(key, value);
 	}
 
 	public boolean isInt(String key) {

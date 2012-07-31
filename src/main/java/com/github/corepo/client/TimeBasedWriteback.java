@@ -37,6 +37,7 @@ public class TimeBasedWriteback implements Runnable {
 					originalRepository.writeback(coRepository
 							.selectAsObject(key));
 				}
+				keyUpdateTime.notifyWritebacked(key, System.currentTimeMillis());
 			}
 			try {
 				Thread.sleep(writebackPeriodInMillis);

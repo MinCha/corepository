@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import tokyotyrant.MRDB;
+import tokyotyrant.networking.NodeAddress;
 import tokyotyrant.transcoder.IntegerTranscoder;
 import tokyotyrant.transcoder.StringTranscoder;
 
@@ -13,6 +14,12 @@ public class TTCoRepository implements CoRepository {
 	private MRDB tt;
 
 	private final IntegerTranscoder integerTranscoder = new IntegerTranscoder();
+	
+	public TTCoRepository(String ip, int port) throws Exception {
+		tt = new MRDB();
+		tt.setGlobalTimeout(2000);
+		tt.open(NodeAddress.addresses("tcp://" + ip + ":" + port));		
+	}
 
 	public TTCoRepository(MRDB tt) {
 		this.tt = tt;
