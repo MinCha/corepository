@@ -3,10 +3,10 @@ package com.github.corepo.client.measurement.support;
 import com.github.corepo.client.Item;
 import com.github.corepo.client.OriginalRepository;
 
-public class FakeOriginalRepository implements OriginalRepository {
-	private FakeVisitationDAO visitationDAO;
+public class VisitationOriginalRepository implements OriginalRepository {
+	private VisitationDAO visitationDAO;
 	
-	public FakeOriginalRepository(FakeVisitationDAO visitationDAO) {
+	public VisitationOriginalRepository(VisitationDAO visitationDAO) {
 		this.visitationDAO = visitationDAO;
 	}
 

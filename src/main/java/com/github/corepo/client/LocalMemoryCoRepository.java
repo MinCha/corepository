@@ -20,6 +20,7 @@ public class LocalMemoryCoRepository implements CoRepository {
 	private Map<String, Object> locks = new ConcurrentHashMap<String, Object>();
 	private Map<String, Object> items = new ConcurrentHashMap<String, Object>();
 	private HashBasedMutexProvider mutex = new HashBasedMutexProvider();
+	private boolean connected = true;
 
 	public void update(Item item) {
 		synchronized (mutex.get(item.getKey())) {
@@ -125,5 +126,19 @@ public class LocalMemoryCoRepository implements CoRepository {
 
 	public boolean isInt(String key) {
 		return items.get(key) instanceof Integer;
+	}
+
+	public void close() {
+		locks.clear();
+		items.clear();
+		connected = false;
+	}
+
+	public int size() {
+		return items.size();
+	}
+
+	public boolean isConnected() {
+		return connected;
 	}
 }

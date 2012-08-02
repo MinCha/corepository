@@ -3,10 +3,10 @@ package com.github.corepo.client;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -77,19 +77,19 @@ public class LRUKeyUpdateTimeTest {
 				Mockito.any(RemovalNotification.class));
 	}
 
-	@SuppressWarnings("unchecked")
 	@Test
-	public void shouldFireRemovalEvent_WhenRemovingAllItems() {
+	public void shouldReturnAllKeys() {
 		sut = new LRUKeyUpdateTime(removalListener, 2);
 		sut.notifyUpdated(keyA, System.currentTimeMillis());
 		sut.notifyUpdated(keyB, System.currentTimeMillis());
 		sut.notifyUpdated(keyA, System.currentTimeMillis());
 		sut.notifyUpdated(keyB, System.currentTimeMillis());
 
-		sut.removeAll();
+		Set<String> result = sut.findAllKeys();
 
-		verify(removalListener, times(2)).onRemoval(
-				Mockito.any(RemovalNotification.class));
+		assertThat(result.size(), is(2));
+		assertThat(result, hasItem(keyA));
+		assertThat(result, hasItem(keyB));
 	}
 
 	@Test

@@ -1,24 +1,21 @@
 package com.github.corepo.client;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import tokyotyrant.MRDB;
 import tokyotyrant.networking.NodeAddress;
 import tokyotyrant.transcoder.IntegerTranscoder;
 import tokyotyrant.transcoder.StringTranscoder;
 
 public class TTCoRepository implements CoRepository {
-	private static final Logger LOG = LoggerFactory.getLogger(TTCoRepository.class);
 	static final String LOCK_KEY_PREFIX = "_CO_REPOSITORY_LOCK_FOR_";
 	private MRDB tt;
+	private boolean connected = true;
 
 	private final IntegerTranscoder integerTranscoder = new IntegerTranscoder();
-	
+
 	public TTCoRepository(String ip, int port) throws Exception {
 		tt = new MRDB();
 		tt.setGlobalTimeout(2000);
-		tt.open(NodeAddress.addresses("tcp://" + ip + ":" + port));		
+		tt.open(NodeAddress.addresses("tcp://" + ip + ":" + port));
 	}
 
 	public TTCoRepository(MRDB tt) {
@@ -55,9 +52,6 @@ public class TTCoRepository implements CoRepository {
 	public boolean lock(String key) {
 		final int winner = 1;
 		int result = increase(LOCK_KEY_PREFIX + key);
-		if (winner == result) {
-			LOG.info(key + " winner");
-		} 
 		return winner == result;
 	}
 
@@ -74,7 +68,7 @@ public class TTCoRepository implements CoRepository {
 		if (value == null) {
 			return Item.withNoValue(key);
 		}
-		return new Item(key, value);						
+		return new Item(key, value);
 	}
 
 	public Item selectAsInt(String key) {
@@ -82,7 +76,7 @@ public class TTCoRepository implements CoRepository {
 		if (value == null) {
 			return Item.withNoValue(key);
 		}
-		return new Item(key, (Integer) value);						
+		return new Item(key, (Integer) value);
 	}
 
 	public boolean isInt(String key) {
@@ -92,5 +86,14 @@ public class TTCoRepository implements CoRepository {
 		} catch (Exception e) {
 			return false;
 		}
+	}
+
+	public void close() {
+		tt.close();
+		connected = false;
+	}
+
+	public boolean isConnected() {
+		return connected;
 	}
 }

@@ -6,23 +6,26 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Unlocker {
+public class Unlocker implements Runnable {
 	private static final Logger LOG = LoggerFactory.getLogger(Unlocker.class);
 	private LinkedList<UnlockRequest> requests = new LinkedList<UnlockRequest>();
 	private CoRepository coRepository;
-	private boolean activation = false;
+	private boolean running = true;
 	private final Object lock = new Object();
 
 	public Unlocker(CoRepository coRepository) {
 		this.coRepository = coRepository;
+		runBackgroundUnlocker();
+		Runtime.getRuntime().addShutdownHook(
+				new Thread(new UnlockerShutdownHook(this)));
 	}
 
-	public void active() {
-		activation = true;
-		Thread t = new Thread(new DeplayedUnlocker());
-		t.setDaemon(true);
-		t.start();
-		Runtime.getRuntime().addShutdownHook(new UnlockerShutdownHook());
+	public void stop() {
+		running = false;
+		synchronized (lock) {
+			lock.notify();
+			unlockAll();
+		}
 	}
 
 	public void requestUnlock(String key) {
@@ -30,82 +33,71 @@ public class Unlocker {
 	}
 
 	public void requestUnlock(String key, int timeInMillis) {
-		if (activation == false) {
+		if (running == false) {
 			throw new IllegalStateException(
 					"Unlocker is not active. Please run active method before call.");
 		}
-
-		requests.add(new UnlockRequest(key, timeInMillis));
+		synchronized (lock) {
+			requests.add(new UnlockRequest(key, timeInMillis));
+		}
 	}
 
-	private class DeplayedUnlocker implements Runnable {
-		public void run() {
-			try {
-				while (activation) {
-					unlockAllItemsOvered();
-					Thread.sleep(100);
+	public void run() {
+		try {
+			while (running) {
+				synchronized (lock) {
+					@SuppressWarnings("unchecked")
+					List<UnlockRequest> copy = (List<UnlockRequest>) requests
+							.clone();
+					for (UnlockRequest each : copy) {
+						if (each.isUnlockable() == false) {
+							continue;
+						} else {
+							if (coRepository.exists(each.key())) {
+								unlockWithRetry(each, 3);
+							}
+							requests.remove(each);
+						}
+					}
+
+					lock.wait(100);
 				}
-			} catch (InterruptedException e) {
 			}
+		} catch (InterruptedException e) {
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	void unlockAll() {
+		if (coRepository.isConnected() == false) {
+			return;
 		}
 
-		private void unlockAllItemsOvered() {
-			synchronized (lock) {
-				@SuppressWarnings("unchecked")
-				List<UnlockRequest> copy = (List<UnlockRequest>) requests
-						.clone();
-				for (UnlockRequest each : copy) {
-					if (each.isUnlockable() == false) {
-						continue;
-					} else {
-						if (coRepository.exists(each.key)) {
-							unlockWithRetry(each, 3);
-						}
-						requests.remove(each);
-					}
-				}
+		synchronized (lock) {
+			LOG.info("UnlockerHook has just started, wating count is "
+					+ requests.size());
+			List<UnlockRequest> targets = (List<UnlockRequest>) requests
+					.clone();
+			for (UnlockRequest each : targets) {
+				unlockWithRetry(each, 3);
 			}
+			LOG.info("UnlockerHook has just ended");
 		}
 	}
 
 	private void unlockWithRetry(UnlockRequest each, int retryCount) {
 		for (int i = 0; i < retryCount; i++) {
-			boolean result = coRepository.unlock(each.key);
+			boolean result = coRepository.unlock(each.key());
 			if (result) {
 				return;
 			}
 		}
 	}
 
-	private class UnlockerShutdownHook extends Thread {
-		@SuppressWarnings({ "unchecked" })
-		public void run() {
-			synchronized (lock) {
-				LOG.info("ShutdownHook Starts, wating count is "
-						+ requests.size());
-				List<UnlockRequest> targets = (List<UnlockRequest>) requests
-						.clone();
-				for (UnlockRequest each : targets) {
-					unlockWithRetry(each, 3);
-				}
-				LOG.info("ShutdownHook ends");
-			}
-		}
-	}
-
-	private class UnlockRequest extends BaseObject {
-		private String key;
-		private long requestedTime;
-		private long timeInMillis;
-
-		private UnlockRequest(String key, long timeInMillis) {
-			this.key = key;
-			this.requestedTime = System.currentTimeMillis();
-			this.timeInMillis = timeInMillis;
-		}
-
-		private boolean isUnlockable() {
-			return requestedTime + timeInMillis < System.currentTimeMillis();
-		}
+	private void runBackgroundUnlocker() {
+		Thread t = new Thread(this);
+		t.setName("CoRepository Unlocker by Thread"
+				+ Thread.currentThread().getName());
+		t.start();
 	}
 }

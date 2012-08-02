@@ -4,17 +4,17 @@ import com.github.corepo.client.CoRepository;
 import com.github.corepo.client.CoRepositoryClient;
 import com.github.corepo.client.Item;
 import com.github.corepo.client.LocalMemoryCoRepository;
-import com.github.corepo.client.measurement.support.FakeOriginalRepository;
-import com.github.corepo.client.measurement.support.FakeVisitationDAO;
+import com.github.corepo.client.measurement.support.VisitationOriginalRepository;
+import com.github.corepo.client.measurement.support.VisitationDAO;
 
 public class CoRepositoryClientVSCoRepository {
-	private static final int count = 200000;
+	private static final int count = 100000;
 
 	public static void main(String[] args) throws InterruptedException {
 		highlightedTitle("FirstTouchWithLock");
 		firstTouch_WithLock();
-		// highlightedTitle("SecondTouchWithNolock");
-		// secondTouch_WithNoLock();
+		highlightedTitle("SecondTouchWithNolock");
+		secondTouch_WithNoLock();
 	}
 
 	public static void highlightedTitle(String title)
@@ -28,8 +28,8 @@ public class CoRepositoryClientVSCoRepository {
 
 	public static void firstTouch_WithLock() throws InterruptedException {
 		CoRepository coRepository = new LocalMemoryCoRepository();
-		FakeOriginalRepository fakeOriginalRepository = new FakeOriginalRepository(
-				new FakeVisitationDAO());
+		VisitationOriginalRepository fakeOriginalRepository = new VisitationOriginalRepository(
+				new VisitationDAO());
 		CoRepositoryClient client = new CoRepositoryClient(coRepository,
 				fakeOriginalRepository);
 
@@ -47,21 +47,21 @@ public class CoRepositoryClientVSCoRepository {
 
 		current = System.currentTimeMillis();
 
-		// for (int i = 0; i < count; i++) {
-		// coRepository.update(new Item("K2" + i, i));
-		// }
-		// for (int i = 0; i < count; i++) {
-		// coRepository.selectAsInt("K2" + i);
-		// }
-		//
-		// System.out.println("First Touch Corepository Time : "
-		// + (System.currentTimeMillis() - current));
+		for (int i = 0; i < count; i++) {
+			coRepository.update(new Item("K2" + i, i));
+		}
+		for (int i = 0; i < count; i++) {
+			coRepository.selectAsInt("K2" + i);
+		}
+
+		System.out.println("First Touch Corepository Time : "
+				+ (System.currentTimeMillis() - current));
 	}
 
 	public static void secondTouch_WithNoLock() {
 		CoRepository coRepository = new LocalMemoryCoRepository();
-		FakeOriginalRepository fakeOriginalRepository = new FakeOriginalRepository(
-				new FakeVisitationDAO());
+		VisitationOriginalRepository fakeOriginalRepository = new VisitationOriginalRepository(
+				new VisitationDAO());
 		CoRepositoryClient client = new CoRepositoryClient(coRepository,
 				fakeOriginalRepository);
 

@@ -24,13 +24,12 @@ public class TimeBasedWritebackTest {
 
 	@Test
 	public void shouldWritebackEveryPeriod() throws InterruptedException {
-		sut = new TimeBasedWriteback(keyUpdateTime, originalRepository,
-				coRepository, 10);
 		when(keyUpdateTime.findKeysOverThan(10)).thenReturn(
 				Arrays.asList(item.getKey()));
 		when(coRepository.selectAsObject(item.getKey())).thenReturn(item);
-		
-		sut.start();
+		when(coRepository.exists(item.getKey())).thenReturn(true);
+		sut = new TimeBasedWriteback(keyUpdateTime, originalRepository,
+				coRepository, 10);
 
 		Thread.sleep(10 * 5 + 10);
 		sut.stop();

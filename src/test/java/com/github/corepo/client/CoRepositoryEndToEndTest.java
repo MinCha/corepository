@@ -5,15 +5,15 @@ import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import com.github.corepo.client.measurement.support.FakeOriginalRepository;
-import com.github.corepo.client.measurement.support.FakeVisitationDAO;
+import com.github.corepo.client.measurement.support.VisitationOriginalRepository;
+import com.github.corepo.client.measurement.support.VisitationDAO;
 
 public class CoRepositoryEndToEndTest {
 	private final String key = "count";
 	@Test
 	public void oneUserUsesCoRepository() {
-		OriginalRepository originalRepository = new FakeOriginalRepository(
-				new FakeVisitationDAO());
+		OriginalRepository originalRepository = new VisitationOriginalRepository(
+				new VisitationDAO());
 		CoRepositoryClient client = new CoRepositoryClient(
 				new LocalMemoryCoRepository(), originalRepository, 10000);
 

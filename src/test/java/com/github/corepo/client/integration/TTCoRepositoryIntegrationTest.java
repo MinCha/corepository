@@ -7,13 +7,13 @@ import static org.junit.Assert.assertThat;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.github.corepo.client.CoRepository;
-import com.github.corepo.client.CoRepositoryAcceptanceTest;
-import com.github.corepo.client.TTCoRepository;
-
 import tokyotyrant.MRDB;
 import tokyotyrant.networking.NodeAddress;
 import tokyotyrant.transcoder.StringTranscoder;
+
+import com.github.corepo.client.CoRepository;
+import com.github.corepo.client.CoRepositoryAcceptanceTest;
+import com.github.corepo.client.TTCoRepository;
 
 /**
  * You need running TT server for executing this test because this is an
@@ -23,7 +23,8 @@ import tokyotyrant.transcoder.StringTranscoder;
  * 
  */
 public class TTCoRepositoryIntegrationTest extends CoRepositoryAcceptanceTest {
-	private final String ip = "10.64.179.242"; // change this to your ip before executing
+	private final String ip = "10.64.144.118"; // change this to your ip before
+												// executing
 	private final int port = 1978; // change this to your port before executing
 	private MRDB tt;
 
@@ -42,5 +43,5 @@ public class TTCoRepositoryIntegrationTest extends CoRepositoryAcceptanceTest {
 		assertThat(tt.await(tt.ext("tcrdbput", key, "1", 1,
 				new StringTranscoder())), is(notNullValue()));
 		assertThat(tt.await(tt.get(key)), is(notNullValue()));
-	}	
+	}
 }

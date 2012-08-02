@@ -15,9 +15,11 @@ import redis.clients.jedis.JedisPoolConfig;
 import com.google.common.primitives.Ints;
 
 public class RedisCoRepository implements CoRepository {
-	private static final Logger LOG = LoggerFactory.getLogger(RedisCoRepository.class);
+	private static final Logger LOG = LoggerFactory
+			.getLogger(RedisCoRepository.class);
 	private static final String LOCK_KEY_PREFIX = "_CO_REPOSITORY_LOCK_FOR_";
 	private JedisPool jedisPool;
+	private boolean connected = true;
 
 	public RedisCoRepository(String host, int port) {
 		JedisPoolConfig config = new JedisPoolConfig();
@@ -63,7 +65,7 @@ public class RedisCoRepository implements CoRepository {
 		Jedis jedis = jedisPool.getResource();
 		try {
 			if (item.isInteger()) {
-				jedis.set(item.getKey(), String.valueOf(item.getValueAsInt()));			
+				jedis.set(item.getKey(), String.valueOf(item.getValueAsInt()));
 			} else {
 				jedis.set(item.getKey().getBytes(), serialize(item.getValue()));
 			}
@@ -113,7 +115,7 @@ public class RedisCoRepository implements CoRepository {
 		int result = increase(LOCK_KEY_PREFIX + key);
 		if (winner == result) {
 			LOG.info(key + " winner");
-		} 
+		}
 		return winner == result;
 	}
 
@@ -129,25 +131,33 @@ public class RedisCoRepository implements CoRepository {
 			return false;
 		}
 	}
-	
-    private byte[] serialize(Object obj) {
-    	try {
-	        ByteArrayOutputStream b = new ByteArrayOutputStream();
-	        ObjectOutputStream o = new ObjectOutputStream(b);
-	        o.writeObject(obj);
-	        return b.toByteArray();
-    	} catch (Exception e) {
-    		throw new SerializationException(e.toString(), e);
-    	}
-    }
 
-    private Object deserialize(byte[] bytes) {
-    	try {
-	        ByteArrayInputStream b = new ByteArrayInputStream(bytes);
-	        ObjectInputStream o = new ObjectInputStream(b);
-	        return o.readObject();
-    	} catch (Exception e) {
-    		throw new SerializationException(e.toString(), e);    		
-    	}
-    }
+	private byte[] serialize(Object obj) {
+		try {
+			ByteArrayOutputStream b = new ByteArrayOutputStream();
+			ObjectOutputStream o = new ObjectOutputStream(b);
+			o.writeObject(obj);
+			return b.toByteArray();
+		} catch (Exception e) {
+			throw new SerializationException(e.toString(), e);
+		}
+	}
+
+	private Object deserialize(byte[] bytes) {
+		try {
+			ByteArrayInputStream b = new ByteArrayInputStream(bytes);
+			ObjectInputStream o = new ObjectInputStream(b);
+			return o.readObject();
+		} catch (Exception e) {
+			throw new SerializationException(e.toString(), e);
+		}
+	}
+
+	public void close() {
+		connected = false;
+	}
+
+	public boolean isConnected() {
+		return connected;
+	}
 }

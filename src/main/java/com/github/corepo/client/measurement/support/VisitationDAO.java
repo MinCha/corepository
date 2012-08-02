@@ -3,7 +3,7 @@ package com.github.corepo.client.measurement.support;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FakeVisitationDAO {
+public class VisitationDAO {
 	private Map<String, Integer> table = new HashMap<String, Integer>();
 
 	public int selectVisitationCount(String id) {

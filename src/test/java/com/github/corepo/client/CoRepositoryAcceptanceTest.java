@@ -11,8 +11,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.github.corepo.client.measurement.support.FakeOriginalRepository;
-import com.github.corepo.client.measurement.support.FakeVisitationDAO;
+import com.github.corepo.client.measurement.support.VisitationOriginalRepository;
+import com.github.corepo.client.measurement.support.VisitationDAO;
 import com.github.corepo.client.measurement.support.NameAge;
 
 /**
@@ -24,8 +24,8 @@ import com.github.corepo.client.measurement.support.NameAge;
 public abstract class CoRepositoryAcceptanceTest {
 	protected CoRepository sut;
 
-	protected final OriginalRepository originalRepository = new FakeOriginalRepository(
-			new FakeVisitationDAO());
+	protected final OriginalRepository originalRepository = new VisitationOriginalRepository(
+			new VisitationDAO());
 	protected final String key = "key" + System.currentTimeMillis();
 	protected final String keyForLockA = "keyA" + System.currentTimeMillis();
 	protected final String keyForLockB = "keyB" + System.currentTimeMillis();
@@ -65,7 +65,7 @@ public abstract class CoRepositoryAcceptanceTest {
 	public void canSelectObject() {
 		NameAge nameAge = new NameAge("min", 33);
 		sut.insert(new Item(key, nameAge));
-		
+
 		Item item = sut.selectAsObject(key);
 
 		NameAge result = (NameAge) item.getValue();
@@ -176,8 +176,7 @@ public abstract class CoRepositoryAcceptanceTest {
 			throws InterruptedException {
 		final int clientCount = 50;
 		final int callCount = 300;
-		ExecutorService executors = Executors
-				.newFixedThreadPool(clientCount);
+		ExecutorService executors = Executors.newFixedThreadPool(clientCount);
 
 		for (int i = 0; i < clientCount; i++) {
 			final CoRepositoryClient client = new CoRepositoryClient(sut,
@@ -263,23 +262,24 @@ public abstract class CoRepositoryAcceptanceTest {
 			final int clientCount = 100;
 			final int callCount = 100;
 			final String currentKey = key + System.currentTimeMillis();
-			ExecutorService executors = Executors.newFixedThreadPool(clientCount);
-	
+			ExecutorService executors = Executors
+					.newFixedThreadPool(clientCount);
+
 			for (int i = 0; i < clientCount; i++) {
 				executors.submit(new Runnable() {
 					public void run() {
 						for (int i = 0; i < callCount; i++) {
 							if (sut.lock(currentKey)) {
-								lockedCount++;	
+								lockedCount++;
 							}
 						}
 					}
 				});
 			}
-	
+
 			executors.shutdown();
 			executors.awaitTermination(60, TimeUnit.SECONDS);
-	
+
 			assertThat(lockedCount, is(1));
 			sut.unlock(currentKey);
 			lockedCount = 0;

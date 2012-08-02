@@ -32,6 +32,10 @@ public interface CoRepository {
 	boolean lock(String key);
 
 	boolean unlock(String key);
-	
+
 	boolean isInt(String key);
+
+	boolean isConnected();
+
+	void close();
 }

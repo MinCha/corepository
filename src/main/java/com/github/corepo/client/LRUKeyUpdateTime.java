@@ -1,7 +1,9 @@
 package com.github.corepo.client;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +16,7 @@ public class LRUKeyUpdateTime {
 	@SuppressWarnings("unused")
 	private static final Logger LOG = LoggerFactory
 			.getLogger(LRUKeyUpdateTime.class);
-	private final static long DEFAULT_SIZE = 10000;
+	private final static long DEFAULT_SIZE = 100000;
 	private Cache<String, UpdateTime> lastUpdated;
 	private Cache<String, UpdateTime> lastWritebacked;
 
@@ -67,6 +69,11 @@ public class LRUKeyUpdateTime {
 			long current = System.currentTimeMillis();
 			UpdateTime writebackedTime = lastWritebacked.getIfPresent(key);
 			UpdateTime updateedTime = lastUpdated.getIfPresent(key);
+
+			if (writebackedTime == null) {
+				continue;
+			}
+
 			if (current - timeInMillis > writebackedTime.time()
 					&& updateedTime.time() > writebackedTime.time()) {
 				result.add(key);
@@ -75,11 +82,20 @@ public class LRUKeyUpdateTime {
 		return result;
 	}
 
-	public void removeAll() {
-		lastUpdated.invalidateAll();
+	public Set<String> findAllKeys() {
+		if (lastUpdated == null) {
+			return new HashSet<String>();
+		}
+
+		return lastUpdated.asMap().keySet();
 	}
 
 	long size() {
 		return lastUpdated.size();
+	}
+
+	void clear() {
+		lastUpdated = null;
+		lastWritebacked = null;
 	}
 }
