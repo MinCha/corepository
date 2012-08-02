@@ -3,7 +3,7 @@ package com.github.corepo.client;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class InitialValuePuller {
+class InitialValuePuller {
 	@SuppressWarnings("unused")
 	private final static Logger LOG = LoggerFactory
 			.getLogger(InitialValuePuller.class);
@@ -12,18 +12,16 @@ public class InitialValuePuller {
 	private CoRepository coRepository;
 	private OriginalRepository originalRepository;
 	private long timeoutInMillis = 1000;
-	private Unlocker unlocker;
 
-	public InitialValuePuller(CoRepository coRepository,
+	InitialValuePuller(CoRepository coRepository,
 			OriginalRepository originalRepository,
-			LRUKeyUpdateTime keyUpdateTime, Unlocker unlocker) {
+			LRUKeyUpdateTime keyUpdateTime) {
 		this.coRepository = coRepository;
 		this.originalRepository = originalRepository;
 		this.keyUpdateTime = keyUpdateTime;
-		this.unlocker = unlocker;
 	}
 
-	public void ensurePulled(String key) {
+	void ensurePulled(String key) {
 		if (keyUpdateTime.exists(key)) {
 			return;
 		}
@@ -39,14 +37,12 @@ public class InitialValuePuller {
 
 		Item item = originalRepository.read(key);
 		if (item.isNotFound()) {
-			unlocker.requestUnlock(key);
 			wakeUpAllThreadsWatingForCompletingPull(key);
 			throw new NonExistentKeyException(key);
 		}
 
 		keyUpdateTime.notifyUpdated(key, System.currentTimeMillis());
 		coRepository.insert(item);
-		unlocker.requestUnlock(key);
 		wakeUpAllThreadsWatingForCompletingPull(key);
 	}
 

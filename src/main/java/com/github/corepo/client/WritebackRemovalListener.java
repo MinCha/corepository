@@ -8,7 +8,7 @@ public class WritebackRemovalListener implements
 	private CoRepository coRepository;
 	private OriginalRepository originalRepository;
 
-	public WritebackRemovalListener(CoRepository coRepository,
+	WritebackRemovalListener(CoRepository coRepository,
 			OriginalRepository originalRepository) {
 		this.coRepository = coRepository;
 		this.originalRepository = originalRepository;

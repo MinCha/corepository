@@ -26,7 +26,7 @@ public class MemoryFootprint {
 		for (int i = 0; i < 100; i++) {
 			tasks.add(new Callable<Boolean>() {
 				public Boolean call() throws Exception {
-					for (int j = 0; j < 1000; j++) {
+					for (int j = 0; j < 100; j++) {
 						client.update(new Item("K" + keyIndex.addAndGet(1), 0));
 					}
 					return Boolean.TRUE;

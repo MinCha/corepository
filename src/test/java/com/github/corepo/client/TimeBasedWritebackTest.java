@@ -30,6 +30,7 @@ public class TimeBasedWritebackTest {
 		when(coRepository.exists(item.getKey())).thenReturn(true);
 		sut = new TimeBasedWriteback(keyUpdateTime, originalRepository,
 				coRepository, 10);
+		sut.start();
 
 		Thread.sleep(10 * 5 + 10);
 		sut.stop();

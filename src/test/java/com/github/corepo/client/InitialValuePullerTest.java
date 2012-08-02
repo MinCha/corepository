@@ -19,8 +19,6 @@ public class InitialValuePullerTest {
 	private OriginalRepository originalRepository;
 	@Mock
 	private LRUKeyUpdateTime keyUpdateTime;
-	@Mock
-	private Unlocker unlocker;
 
 	@Test
 	public void initialValueShouldBePulledToCoRepository() {
@@ -28,7 +26,7 @@ public class InitialValuePullerTest {
 		when(coRepository.lock(key)).thenReturn(true);
 		when(originalRepository.read(key)).thenReturn(item);
 		sut = new InitialValuePuller(coRepository, originalRepository,
-				keyUpdateTime, unlocker);
+				keyUpdateTime);
 
 		sut.ensurePulled(key);
 
@@ -38,7 +36,7 @@ public class InitialValuePullerTest {
 	@Test(expected = TimeoutException.class)
 	public void shouldWaitPulling_UntilLimitedTime() {
 		sut = new InitialValuePuller(coRepository, originalRepository,
-				keyUpdateTime, unlocker);
+				keyUpdateTime);
 
 		sut.ensurePulled(key);
 	}
@@ -48,7 +46,7 @@ public class InitialValuePullerTest {
 		when(originalRepository.read(key)).thenReturn(Item.withNoValue(key));
 		when(coRepository.lock(key)).thenReturn(true);
 		sut = new InitialValuePuller(coRepository, originalRepository,
-				keyUpdateTime, unlocker);
+				keyUpdateTime);
 
 		sut.ensurePulled(key);
 	}
@@ -57,7 +55,7 @@ public class InitialValuePullerTest {
 	public void onceUserKeyShouldBeCached() {
 		when(keyUpdateTime.exists(key)).thenReturn(true);
 		sut = new InitialValuePuller(coRepository, originalRepository,
-				keyUpdateTime, unlocker);
+				keyUpdateTime);
 
 		sut.ensurePulled(key);
 

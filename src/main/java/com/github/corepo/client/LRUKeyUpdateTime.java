@@ -12,7 +12,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
 
-public class LRUKeyUpdateTime {
+class LRUKeyUpdateTime {
 	@SuppressWarnings("unused")
 	private static final Logger LOG = LoggerFactory
 			.getLogger(LRUKeyUpdateTime.class);
@@ -20,19 +20,19 @@ public class LRUKeyUpdateTime {
 	private Cache<String, UpdateTime> lastUpdated;
 	private Cache<String, UpdateTime> lastWritebacked;
 
-	public LRUKeyUpdateTime(RemovalListener<String, UpdateTime> removalListener) {
+	LRUKeyUpdateTime(RemovalListener<String, UpdateTime> removalListener) {
 		this(removalListener, DEFAULT_SIZE);
 	}
 
-	public LRUKeyUpdateTime(
-			RemovalListener<String, UpdateTime> removalListener, long size) {
+	LRUKeyUpdateTime(RemovalListener<String, UpdateTime> removalListener,
+			long size) {
 		this.lastUpdated = CacheBuilder.newBuilder().maximumSize(size)
 				.removalListener(removalListener).build();
 		this.lastWritebacked = CacheBuilder.newBuilder().maximumSize(size)
 				.build();
 	}
 
-	public void notifyUpdated(String key, long updatedTime) {
+	void notifyUpdated(String key, long updatedTime) {
 		UpdateTime old = lastUpdated.getIfPresent(key);
 
 		if (old == null) {
@@ -47,23 +47,23 @@ public class LRUKeyUpdateTime {
 		}
 	}
 
-	public void notifyWritebacked(String key, long writebackedTime) {
+	void notifyWritebacked(String key, long writebackedTime) {
 		lastWritebacked.put(key, new UpdateTime(writebackedTime));
 	}
 
-	public boolean isUpdated(String key) {
+	boolean isUpdated(String key) {
 		return lastUpdated.getIfPresent(key) != null;
 	}
 
-	public boolean isWritebacked(String key) {
+	boolean isWritebacked(String key) {
 		return lastWritebacked.getIfPresent(key) != null;
 	}
 
-	public boolean exists(String key) {
+	boolean exists(String key) {
 		return isUpdated(key);
 	}
 
-	public List<String> findKeysOverThan(long timeInMillis) {
+	List<String> findKeysOverThan(long timeInMillis) {
 		List<String> result = new ArrayList<String>();
 		for (String key : lastUpdated.asMap().keySet()) {
 			long current = System.currentTimeMillis();
@@ -82,20 +82,11 @@ public class LRUKeyUpdateTime {
 		return result;
 	}
 
-	public Set<String> findAllKeys() {
+	Set<String> findAllKeys() {
 		if (lastUpdated == null) {
 			return new HashSet<String>();
 		}
 
 		return lastUpdated.asMap().keySet();
-	}
-
-	long size() {
-		return lastUpdated.size();
-	}
-
-	void clear() {
-		lastUpdated = null;
-		lastWritebacked = null;
 	}
 }

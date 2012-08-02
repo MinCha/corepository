@@ -1,24 +1,21 @@
 package com.github.corepo.client;
 
-public class CoRepositoryClient implements Runnable {
+public class CoRepositoryClient {
 	private CoRepository coRepository;
 	private LRUKeyUpdateTime keyUpdateTime;
 	private InitialValuePuller puller;
 	private TimeBasedWriteback timeBasedWriteback;
-	private Unlocker unlocker;
 
 	CoRepositoryClient(CoRepository coRepository,
 			OriginalRepository originalRepository,
 			LRUKeyUpdateTime keyUpdateTime, int writebackPeriodInMillis) {
 		this.coRepository = coRepository;
 		this.keyUpdateTime = keyUpdateTime;
-		this.unlocker = new Unlocker(coRepository);
 		this.puller = new InitialValuePuller(coRepository, originalRepository,
-				keyUpdateTime, unlocker);
+				keyUpdateTime);
 		timeBasedWriteback = new TimeBasedWriteback(keyUpdateTime,
 				originalRepository, coRepository, writebackPeriodInMillis);
-
-		Runtime.getRuntime().addShutdownHook(new Thread(this));
+		timeBasedWriteback.start();
 	}
 
 	public CoRepositoryClient(CoRepository coRepository,
@@ -63,13 +60,6 @@ public class CoRepositoryClient implements Runnable {
 	}
 
 	public void close() {
-		unlocker.stop();
-		timeBasedWriteback.stop();
-		keyUpdateTime.clear();
 		coRepository.close();
-	}
-
-	public void run() {
-		close();
 	}
 }

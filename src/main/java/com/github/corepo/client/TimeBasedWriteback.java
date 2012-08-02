@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TimeBasedWriteback implements Runnable {
+class TimeBasedWriteback implements Runnable {
 	private static final Logger LOG = LoggerFactory
 			.getLogger(TimeBasedWriteback.class);
 	private OriginalRepository originalRepository;
@@ -16,25 +16,26 @@ public class TimeBasedWriteback implements Runnable {
 	private Object lock = new Object();
 	private AtomicBoolean running = new AtomicBoolean(true);
 
-	public TimeBasedWriteback(LRUKeyUpdateTime keyUpdateTime,
+	TimeBasedWriteback(LRUKeyUpdateTime keyUpdateTime,
 			OriginalRepository originalRepository, CoRepository coRepository,
 			int writebackPeriodInMillis) {
 		this.originalRepository = originalRepository;
 		this.coRepository = coRepository;
 		this.keyUpdateTime = keyUpdateTime;
 		this.writebackPeriodInMillis = writebackPeriodInMillis;
+	}
 
+	void start() {
 		Thread t = new Thread(this);
 		t.setName("CoRepository TimeBasedWriteback");
 		t.setDaemon(true);
 		t.start();
 	}
 
-	public void stop() {
+	void stop() {
 		running.set(false);
 		synchronized (lock) {
 			lock.notify();
-			writebackAll();
 		}
 
 	}
@@ -54,7 +55,7 @@ public class TimeBasedWriteback implements Runnable {
 		}
 	}
 
-	private void writebackAll() {
+	void writebackAll() {
 		if (coRepository.isConnected() == false) {
 			return;
 		}
