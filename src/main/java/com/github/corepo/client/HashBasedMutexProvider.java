@@ -11,7 +11,7 @@ class HashBasedMutexProvider {
 	HashBasedMutexProvider() {
 		this(DEFAULT_DISPERSION);
 	}
-	
+
 	HashBasedMutexProvider(int dispersion) {
 		this.dispersion = dispersion;
 		for (int i = 0; i < dispersion; i++) {
@@ -20,10 +20,6 @@ class HashBasedMutexProvider {
 	}
 
 	Object get(Object key) {
-		if (key.hashCode() == Integer.MIN_VALUE) {
-			return mutexes.get(0);
-		}
-		
-		return mutexes.get(Math.abs(key.hashCode()) % dispersion);
+		return mutexes.get(Math.abs(key.hashCode() % dispersion));
 	}
 }

@@ -22,15 +22,15 @@ public class InitialValuePullerTest {
 
 	@Test
 	public void initialValueShouldBePulledToCoRepository() {
-		Item item = new Item(key, "anyValue");
+		Item initialValue = new Item(key, "anyValue");
 		when(coRepository.lock(key)).thenReturn(true);
-		when(originalRepository.read(key)).thenReturn(item);
+		when(originalRepository.read(key)).thenReturn(initialValue);
 		sut = new InitialValuePuller(coRepository, originalRepository,
 				keyUpdateTime);
 
 		sut.ensurePulled(key);
 
-		verify(coRepository).insert(item);
+		verify(coRepository).insert(initialValue);
 	}
 
 	@Test(expected = TimeoutException.class)
@@ -52,7 +52,7 @@ public class InitialValuePullerTest {
 	}
 
 	@Test
-	public void onceUserKeyShouldBeCached() {
+	public void userKeyShouldBeCachedOnLocalMemory() {
 		when(keyUpdateTime.exists(key)).thenReturn(true);
 		sut = new InitialValuePuller(coRepository, originalRepository,
 				keyUpdateTime);

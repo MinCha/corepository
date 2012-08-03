@@ -1,14 +1,15 @@
 package com.github.corepo.client;
 
 /**
- * CoRepository, core domain object, is responsible for receiving update and
- * select requests from client instead of original repository and sometimes
- * write-backing to original repository. For this reason, CoRepository should
- * able to rapidly process requests from client. You can read more at
- * https://github.com/MinCha/corepository/wiki
+ * CoRepository, core domain object, is responsible for handling UPDATE / SELECT
+ * requests from client instead of original repository. For this reason,
+ * CoRepository should able to rapidly handle requests from client. You can read
+ * more at https://github.com/MinCha/corepository/wiki
  * 
  * @see LocalMemoryCoRepository
  * @see TTCoRepository
+ * @see RedisCoRepository
+ * @see CoRepositoryClient
  * @author Min Cha
  * 
  */
