@@ -17,11 +17,37 @@ public class MemoryFootprint {
 	private static AtomicInteger keyIndex = new AtomicInteger();;
 
 	public static void main(String[] args) throws Exception {
+		long start = System.currentTimeMillis();
 		CoRepository coRepository = new TTCoRepository("10.64.135.189", 1978);
 		final CoRepositoryClient client = new CoRepositoryClient(coRepository,
 				new PossitiveOriginalRepository(), 1000 * 60);
+		final CoRepositoryClient secondClient = new CoRepositoryClient(
+				coRepository, new PossitiveOriginalRepository(), 1000 * 60);
+		final CoRepositoryClient thirdClient = new CoRepositoryClient(
+				coRepository, new PossitiveOriginalRepository(), 1000 * 60);
 
 		ExecutorService executors = Executors.newFixedThreadPool(100);
+		List<Callable<Boolean>> tasks = createMemoryConsumer(client);
+		executors.invokeAll(tasks);
+		System.out.println("Step1 Completed.");
+
+		tasks = createMemoryConsumer(secondClient);
+		executors.invokeAll(tasks);
+		System.out.println("Step2 Completed.");
+
+		tasks = createMemoryConsumer(thirdClient);
+		executors.invokeAll(tasks);
+		System.out.println("Step3 Completed.");
+
+		executors.shutdown();
+		System.out.println("This will be closed.");
+		client.close();
+
+		System.out.println(System.currentTimeMillis() - start);
+	}
+
+	private static List<Callable<Boolean>> createMemoryConsumer(
+			final CoRepositoryClient client) {
 		List<Callable<Boolean>> tasks = new ArrayList<Callable<Boolean>>();
 		for (int i = 0; i < 1000; i++) {
 			tasks.add(new Callable<Boolean>() {
@@ -33,11 +59,6 @@ public class MemoryFootprint {
 				}
 			});
 		}
-
-		executors.invokeAll(tasks);
-		System.out.println("Update completed.");
-		executors.shutdown();
-		System.out.println("Will be closed.");
-		client.close();
+		return tasks;
 	}
 }

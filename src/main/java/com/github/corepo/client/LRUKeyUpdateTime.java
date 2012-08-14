@@ -16,7 +16,7 @@ class LRUKeyUpdateTime {
 	@SuppressWarnings("unused")
 	private static final Logger LOG = LoggerFactory
 			.getLogger(LRUKeyUpdateTime.class);
-	private final static long DEFAULT_SIZE = 100000;
+	private final static long DEFAULT_SIZE = 10000;
 	private Cache<String, UpdateTime> lastUpdated;
 	private Cache<String, UpdateTime> lastWritebacked;
 
