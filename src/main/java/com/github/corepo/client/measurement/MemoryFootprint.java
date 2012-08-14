@@ -17,13 +17,13 @@ public class MemoryFootprint {
 	private static AtomicInteger keyIndex = new AtomicInteger();;
 
 	public static void main(String[] args) throws Exception {
-		CoRepository coRepository = new TTCoRepository("10.64.144.118", 1978);
+		CoRepository coRepository = new TTCoRepository("10.64.135.189", 1978);
 		final CoRepositoryClient client = new CoRepositoryClient(coRepository,
 				new PossitiveOriginalRepository(), 1000 * 60);
 
 		ExecutorService executors = Executors.newFixedThreadPool(100);
 		List<Callable<Boolean>> tasks = new ArrayList<Callable<Boolean>>();
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 1000; i++) {
 			tasks.add(new Callable<Boolean>() {
 				public Boolean call() throws Exception {
 					for (int j = 0; j < 100; j++) {
