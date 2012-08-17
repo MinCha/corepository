@@ -6,7 +6,6 @@ import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
 import com.github.corepo.client.CoRepository;
-import com.github.corepo.client.CoRepositoryAcceptanceTest;
 import com.github.corepo.client.Item;
 import com.github.corepo.client.LocalMemoryCoRepository;
 import com.github.corepo.client.NotNumericValueException;

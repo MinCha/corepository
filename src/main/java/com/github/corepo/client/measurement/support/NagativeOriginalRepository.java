@@ -1,5 +1,7 @@
 package com.github.corepo.client.measurement.support;
 
+import java.util.List;
+
 import com.github.corepo.client.Item;
 import com.github.corepo.client.OriginalRepository;
 
@@ -8,6 +10,6 @@ public class NagativeOriginalRepository implements OriginalRepository {
 		return Item.withNoValue(key);
 	}
 
-	public void writeback(Item item) {
+	public void writeback(List<Item> item) {
 	}
 }

@@ -1,5 +1,7 @@
 package com.github.corepo.client;
 
+import java.util.List;
+
 /**
  * OriginalRepository, core domain object, is responsible for returning initial
  * values and write-backing intermediate values again.
@@ -15,5 +17,5 @@ package com.github.corepo.client;
 public interface OriginalRepository {
 	Item read(String key);
 
-	void writeback(Item item);
+	void writeback(List<Item> items);
 }

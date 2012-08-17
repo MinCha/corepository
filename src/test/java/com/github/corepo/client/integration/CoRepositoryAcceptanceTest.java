@@ -1,4 +1,4 @@
-package com.github.corepo.client;
+package com.github.corepo.client.integration;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -11,6 +11,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.github.corepo.client.CoRepository;
+import com.github.corepo.client.CoRepositoryClient;
+import com.github.corepo.client.Item;
+import com.github.corepo.client.OriginalRepository;
+import com.github.corepo.client.TTCoRepository;
 import com.github.corepo.client.measurement.support.NameAge;
 import com.github.corepo.client.measurement.support.VisitationDAO;
 import com.github.corepo.client.measurement.support.VisitationOriginalRepository;

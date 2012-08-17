@@ -34,6 +34,6 @@ public class TimeBasedWritebackTest {
 
 		Thread.sleep(10 * 5 + 10);
 		sut.stop();
-		verify(originalRepository, atLeast(5)).writeback(item);
+		verify(originalRepository, atLeast(5)).writeback(Arrays.asList(item));
 	}
 }

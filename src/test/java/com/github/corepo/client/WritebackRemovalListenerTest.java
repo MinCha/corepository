@@ -3,6 +3,8 @@ package com.github.corepo.client;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -37,7 +39,7 @@ public class WritebackRemovalListenerTest {
 
 		sut.onRemoval(notification);
 
-		verify(originalRepository).writeback(stringItem);
+		verify(originalRepository).writeback(Arrays.asList(stringItem));
 	}
 
 	@Test
@@ -54,6 +56,6 @@ public class WritebackRemovalListenerTest {
 
 		sut.onRemoval(notification);
 
-		verify(originalRepository).writeback(intItem);
+		verify(originalRepository).writeback(Arrays.asList(intItem));
 	}
 }

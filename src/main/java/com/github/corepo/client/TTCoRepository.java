@@ -6,7 +6,7 @@ import tokyotyrant.transcoder.IntegerTranscoder;
 import tokyotyrant.transcoder.StringTranscoder;
 
 public class TTCoRepository implements CoRepository {
-	static final String LOCK_KEY_PREFIX = "_CO_REPOSITORY_LOCK_FOR_";
+	public static final String LOCK_KEY_PREFIX = "_CO_REPOSITORY_LOCK_FOR_";
 	private MRDB tt;
 	private boolean connected = true;
 

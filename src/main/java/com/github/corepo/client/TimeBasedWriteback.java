@@ -1,5 +1,6 @@
 package com.github.corepo.client;
 
+import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -74,9 +75,11 @@ class TimeBasedWriteback implements Runnable {
 		}
 
 		if (coRepository.isInt(key)) {
-			originalRepository.writeback(coRepository.selectAsInt(key));
+			originalRepository.writeback(Arrays.asList(coRepository
+					.selectAsInt(key)));
 		} else {
-			originalRepository.writeback(coRepository.selectAsObject(key));
+			originalRepository.writeback(Arrays.asList(coRepository
+					.selectAsObject(key)));
 		}
 		keyUpdateTime.notifyWritebacked(key, System.currentTimeMillis());
 	}

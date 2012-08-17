@@ -1,5 +1,7 @@
 package com.github.corepo.client;
 
+import java.util.Arrays;
+
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
 
@@ -22,9 +24,11 @@ public class WritebackRemovalListener implements
 		}
 
 		if (coRepository.isInt(getKey(notification))) {
-			originalRepository.writeback(coRepository.selectAsInt(key));
+			originalRepository.writeback(Arrays.asList(coRepository
+					.selectAsInt(key)));
 		} else {
-			originalRepository.writeback(coRepository.selectAsObject(key));
+			originalRepository.writeback(Arrays.asList(coRepository
+					.selectAsObject(key)));
 		}
 	}
 

@@ -12,7 +12,6 @@ import tokyotyrant.networking.NodeAddress;
 import tokyotyrant.transcoder.StringTranscoder;
 
 import com.github.corepo.client.CoRepository;
-import com.github.corepo.client.CoRepositoryAcceptanceTest;
 import com.github.corepo.client.TTCoRepository;
 
 /**
@@ -23,7 +22,7 @@ import com.github.corepo.client.TTCoRepository;
  * 
  */
 public class TTCoRepositoryIntegrationTest extends CoRepositoryAcceptanceTest {
-	private final String ip = "10.64.144.118"; // change this to your ip before
+	private final String ip = "10.64.135.189"; // change this to your ip before
 												// executing
 	private final int port = 1978; // change this to your port before executing
 	private MRDB tt;
