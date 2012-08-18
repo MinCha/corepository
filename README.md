@@ -1,5 +1,5 @@
 ## CoRepository in a nutshell
-![concept](http://good-samples.googlecode.com/files/corepository-concept.gif)
+![concept](http://good-samples.googlecode.com/files/corepository-concept-20120731.gif)
 
 CoRepository is a assistance repository that handles UPDATE/SELECT requests instead of DB. With CoRepository, you can expect reducing the load of DB and improving the response time of transaction. Also, you don`t need to modify DB schema and migrate old data to CoRepository because the CoRepository ensures synchronization with DB by write-back mechanism.
 
