@@ -3,11 +3,11 @@
 
 CoRepository is an assistance repository that handles UPDATE/SELECT requests instead of DB. With CoRepository, you can expect reducing the load of DB and improving the response time of transaction. Also, you don`t need to modify DB schema and migrate old data to CoRepository because the CoRepository ensures synchronization with DB by write-back mechanism.
 
-In fact, CoRepository is a client library. So you need to ready your repository but CoRepository let you use well known NoSQL storages. Now, CoRepository provides Redis, Tokyo Tryant, LocalMemory. Hazelcast is considering as a new repository. To use CoRepository, all that you have to is to ready your repository and pass information such as IP or port when creating your CoRepositoryClient object. 
+In fact, CoRepository is a client library. So you need to set up your repository but CoRepository let you use easily well known NoSQL storages. Now, CoRepository provides Redis, Tokyo Tryant, LocalMemory. Hazelcast is considered as a new repository. To use CoRepository, all that you have to is to set up your repository and pass information such as IP or port when creating your CoRepositoryClient object. 
 
 Following situations would be good for introducing CoRepository.
 
-**1) You need to reduce the load of your operating DB**
+**1) You need to reduce the load of your operating DB or replication delay among a master and slaves.**
 
 You can reduce the load of your operating DB by delegating frequent UPDATE/SELECT requests to CoRepository.
 
