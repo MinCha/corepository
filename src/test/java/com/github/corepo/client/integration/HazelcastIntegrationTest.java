@@ -10,11 +10,11 @@ import org.junit.Test;
 import com.hazelcast.core.Hazelcast;
 
 public class HazelcastIntegrationTest {
-	@Test
-	public void shouldRunAsExpected() throws InterruptedException {
-		Map<String, String> map = Hazelcast.getMap("corepo");
-		map.put("name", "min");
-		
-		assertThat(map.get("name"), is("min"));
-	}
+    @Test
+    public void shouldRunAsExpected() throws InterruptedException {
+	Map<String, String> map = Hazelcast.getMap("corepo");
+	map.put("name", "min");
+
+	assertThat(map.get("name"), is("min"));
+    }
 }

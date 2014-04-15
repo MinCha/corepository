@@ -6,10 +6,10 @@ import com.github.corepo.client.Item;
 import com.github.corepo.client.OriginalRepository;
 
 public class PossitiveOriginalRepository implements OriginalRepository {
-	public Item read(String key) {
-		return new Item(key, 0);
-	}
+    public Item read(String key) {
+	return new Item(key, 0);
+    }
 
-	public void writeback(List<Item> item) {
-	}
+    public void writeback(List<Item> item) {
+    }
 }

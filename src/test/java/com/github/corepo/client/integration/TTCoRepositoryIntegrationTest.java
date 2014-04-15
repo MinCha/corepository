@@ -21,26 +21,27 @@ import com.github.corepo.client.TTCoRepository;
  * @author Min Cha
  * 
  */
+@Ignore
 public class TTCoRepositoryIntegrationTest extends CoRepositoryAcceptanceTest {
-	private final String ip = "10.64.135.189"; // change this to your ip before
-												// executing
-	private final int port = 1978; // change this to your port before executing
-	private MRDB tt;
+    private final String ip = "10.64.135.189"; // change this to your ip before
+    // executing
+    private final int port = 1978; // change this to your port before executing
+    private MRDB tt;
 
-	@Override
-	protected CoRepository getCoRepository() throws Exception {
-		tt = new MRDB();
-		tt.setGlobalTimeout(2000);
-		tt.open(NodeAddress.addresses("tcp://" + ip + ":" + port));
+    @Override
+    protected CoRepository getCoRepository() throws Exception {
+	tt = new MRDB();
+	tt.setGlobalTimeout(2000);
+	tt.open(NodeAddress.addresses("tcp://" + ip + ":" + port));
 
-		return new TTCoRepository(tt);
-	}
+	return new TTCoRepository(tt);
+    }
 
-	@Ignore
-	@Test
-	public void canRunExtOperationWithLockingOption() throws Exception {
-		assertThat(tt.await(tt.ext("tcrdbput", key, "1", 1,
-				new StringTranscoder())), is(notNullValue()));
-		assertThat(tt.await(tt.get(key)), is(notNullValue()));
-	}
+    @Ignore
+    @Test
+    public void canRunExtOperationWithLockingOption() throws Exception {
+	assertThat(tt.await(tt.ext("tcrdbput", key, "1", 1,
+		new StringTranscoder())), is(notNullValue()));
+	assertThat(tt.await(tt.get(key)), is(notNullValue()));
+    }
 }

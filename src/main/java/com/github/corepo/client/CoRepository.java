@@ -14,29 +14,29 @@ package com.github.corepo.client;
  * 
  */
 public interface CoRepository {
-	Item selectAsObject(String key);
+    Item selectAsObject(String key);
 
-	Item selectAsInt(String key);
+    Item selectAsInt(String key);
 
-	void update(Item item);
+    void update(Item item);
 
-	void insert(Item item);
+    void insert(Item item);
 
-	int increase(String key);
+    int increase(String key);
 
-	int decrease(String key);
+    int decrease(String key);
 
-	boolean exists(String key);
+    boolean exists(String key);
 
-	boolean delete(String key);
+    boolean delete(String key);
 
-	boolean lock(String key);
+    boolean lock(String key);
 
-	boolean unlock(String key);
+    boolean unlock(String key);
 
-	boolean isInt(String key);
+    boolean isInt(String key);
 
-	boolean isConnected();
+    boolean isConnected();
 
-	void close();
+    void close();
 }

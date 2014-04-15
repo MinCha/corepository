@@ -13,20 +13,21 @@ import com.github.corepo.client.measurement.support.VisitationOriginalRepository
 import com.github.corepo.client.measurement.support.VisitationDAO;
 
 public class CoRepositoryEndToEndTest {
-	private final String key = "count";
-	@Test
-	public void oneUserUsesCoRepository() {
-		OriginalRepository originalRepository = new VisitationOriginalRepository(
-				new VisitationDAO());
-		CoRepositoryClient client = new CoRepositoryClient(
-				new LocalMemoryCoRepository(), originalRepository, 10000);
+    private final String key = "count";
 
-		int count = client.selectAsInt(key).getValueAsInt();
-		count++;
-		count++;
-		client.update(new Item(key, count));
+    @Test
+    public void oneUserUsesCoRepository() {
+	OriginalRepository originalRepository = new VisitationOriginalRepository(
+		new VisitationDAO());
+	CoRepositoryClient client = new CoRepositoryClient(
+		new LocalMemoryCoRepository(), originalRepository, 10000);
 
-		assertThat(client.selectAsInt(key).getValueAsInt(), is(2));
-		assertThat(originalRepository.read(key).getValueAsInt(), is(0));
-	}
+	int count = client.selectAsInt(key).getValueAsInt();
+	count++;
+	count++;
+	client.update(new Item(key, count));
+
+	assertThat(client.selectAsInt(key).getValueAsInt(), is(2));
+	assertThat(originalRepository.read(key).getValueAsInt(), is(0));
+    }
 }
