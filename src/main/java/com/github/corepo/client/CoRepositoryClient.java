@@ -13,16 +13,16 @@ public class CoRepositoryClient {
 	this.keyUpdateTime = keyUpdateTime;
 	this.puller = new InitialValuePuller(coRepository, originalRepository,
 		keyUpdateTime);
-	timeBasedWriteback = new TimeBasedWriteback(keyUpdateTime,
-		originalRepository, coRepository, writebackPeriodInMillis);
+	timeBasedWriteback = new TimeBasedWriteback(new Writeback(coRepository,
+		originalRepository), keyUpdateTime, writebackPeriodInMillis);
 	timeBasedWriteback.start();
     }
 
     public CoRepositoryClient(CoRepository coRepository,
 	    OriginalRepository originalRepository, int writebackPeriodInMillis) {
-	this(coRepository, originalRepository,
-		new LRUKeyUpdateTime(new WritebackRemovalListener(coRepository,
-			originalRepository)), writebackPeriodInMillis);
+	this(coRepository, originalRepository, new LRUKeyUpdateTime(
+		new KeyRemovalListener(new Writeback(coRepository,
+			originalRepository))), writebackPeriodInMillis);
     }
 
     public CoRepositoryClient(CoRepository coRepository,
