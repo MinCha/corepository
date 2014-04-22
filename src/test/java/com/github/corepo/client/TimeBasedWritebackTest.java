@@ -2,9 +2,6 @@ package com.github.corepo.client;
 
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.Arrays;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,18 +14,20 @@ public class TimeBasedWritebackTest {
     @Mock
     private Writeback writeback;
     @Mock
+    private WritebackEventNotifier notifier;
+    @Mock
     private LRUKeyUpdateTime keyUpdateTime;
-    private final Item item = new Item("string", "value");
 
     @Test
     public void shouldWritebackEveryPeriod() throws InterruptedException {
-	when(keyUpdateTime.findKeysOverThan(10)).thenReturn(
-		Arrays.asList(item.getKey()));
-	sut = new TimeBasedWriteback(writeback, keyUpdateTime, 10);
+	final long writebackPeriodInMillis = 10;
+	sut = new TimeBasedWriteback(writeback, keyUpdateTime,
+		writebackPeriodInMillis);
 	sut.start();
 
 	Thread.sleep(10 * 5 + 10);
 	sut.stop();
-	verify(writeback, atLeast(5)).writeback(item.getKey());
+	verify(keyUpdateTime, atLeast(5)).applyToKeysOverThan(
+		writebackPeriodInMillis, writeback, true);
     }
 }

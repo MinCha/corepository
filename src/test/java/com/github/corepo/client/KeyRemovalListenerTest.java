@@ -29,6 +29,6 @@ public class KeyRemovalListenerTest {
 
 	sut.onRemoval(notification);
 
-	verify(writeback).writeback(key);
+	verify(writeback).execute(key);
     }
 }

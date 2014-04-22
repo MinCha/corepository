@@ -1,8 +1,6 @@
 package com.github.corepo.client;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -63,8 +61,8 @@ class LRUKeyUpdateTime {
 	return isUpdated(key);
     }
 
-    List<String> findKeysOverThan(long timeInMillis) {
-	List<String> result = new ArrayList<String>();
+    void applyToKeysOverThan(long timeInMillis, KeyFunction function,
+	    boolean logAsWritebacked) {
 	for (String key : lastUpdated.asMap().keySet()) {
 	    long current = System.currentTimeMillis();
 	    UpdateTime writebackedTime = lastWritebacked.getIfPresent(key);
@@ -76,10 +74,13 @@ class LRUKeyUpdateTime {
 
 	    if (current - timeInMillis > writebackedTime.time()
 		    && updateedTime.time() > writebackedTime.time()) {
-		result.add(key);
+		function.execute(key);
+
+		if (logAsWritebacked) {
+		    notifyWritebacked(key, System.currentTimeMillis());
+		}
 	    }
 	}
-	return result;
     }
 
     Set<String> findAllKeys() {

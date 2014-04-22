@@ -14,6 +14,7 @@ import org.junit.Test;
 import com.github.corepo.client.CoRepository;
 import com.github.corepo.client.CoRepositoryClient;
 import com.github.corepo.client.Item;
+import com.github.corepo.client.MultiThreadTest;
 import com.github.corepo.client.OriginalRepository;
 import com.github.corepo.client.TTCoRepository;
 import com.github.corepo.client.measurement.support.NameAge;
@@ -177,6 +178,16 @@ public abstract class CoRepositoryAcceptanceTest {
     }
 
     @Test
+    public void canKnowWhetherKeyTypeIsIntegerOrNot() throws Exception {
+	sut.insert(new Item(intKey, 1));
+	sut.insert(new Item(stringKey, "value"));
+
+	assertThat(sut.isInt(intKey), is(true));
+	assertThat(sut.isInt(stringKey), is(false));
+    }
+
+    @MultiThreadTest
+    @Test
     public void multipleClientsShouldShareOneCoRepositoryWithoutConflict()
 	    throws InterruptedException {
 	final int clientCount = 50;
@@ -203,21 +214,14 @@ public abstract class CoRepositoryAcceptanceTest {
 	assertThat(result.getValueAsInt(), is(clientCount * callCount));
     }
 
-    @Test
-    public void canKnowWhetherKeyTypeIsIntegerOrNot() throws Exception {
-	sut.insert(new Item(intKey, 1));
-	sut.insert(new Item(stringKey, "value"));
-
-	assertThat(sut.isInt(intKey), is(true));
-	assertThat(sut.isInt(stringKey), is(false));
-    }
-
+    @MultiThreadTest
     @Test
     public void multipleClientsCanIncreaseOrDecreaseOnSameKeyWithoutConflict()
 	    throws Exception {
 	increaseAndDecreaseByMultiThreadsOn(key);
     }
 
+    @MultiThreadTest
     @Test
     public void multipleClientsCanIncreaseOrDecreaseOnNonExistingSameKeyWithoutConflict()
 	    throws Exception {

@@ -11,7 +11,7 @@ class InitialValuePuller {
     private LRUKeyUpdateTime keyUpdateTime;
     private CoRepository coRepository;
     private OriginalRepository originalRepository;
-    private long timeoutInMillis = 1000;
+    private long timeoutInMillis = 2000;
 
     InitialValuePuller(CoRepository coRepository,
 	    OriginalRepository originalRepository,

@@ -13,7 +13,7 @@ public class KeyRemovalListener implements
 
     public void onRemoval(RemovalNotification<String, UpdateTime> notification) {
 	final String key = getKey(notification);
-	writeback.writeback(key);
+	writeback.execute(key);
     }
 
     String getKey(RemovalNotification<String, UpdateTime> notification) {

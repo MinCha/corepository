@@ -5,12 +5,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 class TimeBasedWriteback implements Runnable {
     private Writeback writeback;
     private LRUKeyUpdateTime keyUpdateTime;
-    private int writebackPeriodInMillis;
+    private long writebackPeriodInMillis;
     private Object lock = new Object();
     private AtomicBoolean running = new AtomicBoolean(true);
 
     TimeBasedWriteback(Writeback writeback, LRUKeyUpdateTime keyUpdateTime,
-	    int writebackPeriodInMillis) {
+	    long writebackPeriodInMillis) {
 	this.writeback = writeback;
 	this.keyUpdateTime = keyUpdateTime;
 	this.writebackPeriodInMillis = writebackPeriodInMillis;
@@ -33,12 +33,8 @@ class TimeBasedWriteback implements Runnable {
 
     public void run() {
 	while (running.get()) {
-	    for (String key : keyUpdateTime
-		    .findKeysOverThan(writebackPeriodInMillis)) {
-		writeback.writeback(key);
-		keyUpdateTime
-			.notifyWritebacked(key, System.currentTimeMillis());
-	    }
+	    keyUpdateTime.applyToKeysOverThan(writebackPeriodInMillis,
+		    writeback, true);
 	    try {
 		synchronized (lock) {
 		    lock.wait(writebackPeriodInMillis);

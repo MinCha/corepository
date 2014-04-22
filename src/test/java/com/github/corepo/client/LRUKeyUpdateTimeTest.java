@@ -4,9 +4,13 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
-import java.util.List;
+import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,6 +29,8 @@ public class LRUKeyUpdateTimeTest {
     private final String nokey = "nokey";
     @Mock
     private RemovalListener<String, UpdateTime> removalListener;
+    @Mock
+    private Writeback writeback;
     private int count = 0;
 
     @Test
@@ -93,34 +99,63 @@ public class LRUKeyUpdateTimeTest {
     }
 
     @Test
-    public void canReturnAllKeysTimeOvered() {
+    public void canApplyFunctionToKeysTimeOvered() {
 	sut = new LRUKeyUpdateTime(removalListener);
-	final long current = System.currentTimeMillis();
-	sut.notifyUpdated("a", secondsAgo(2));
-	sut.notifyUpdated("b", secondsAgo(2));
-	sut.notifyUpdated("c", secondsAgo(2));
-	sut.notifyUpdated("d", current);
-	sut.notifyWritebacked("c", current);
+	sut.notifyUpdated("a", secondsAgo(3));
+	sut.notifyUpdated("b", secondsAgo(3));
+	sut.notifyUpdated("b", secondsAgo(1));
 
-	List<String> result = sut.findKeysOverThan(1000);
+	sut.applyToKeysOverThan(2000, writeback, false);
 
-	assertThat(result.size(), is(2));
-	assertThat(result, hasItem("a"));
-	assertThat(result, hasItem("b"));
-    }
-
-    private long secondsAgo(int seconds) {
-	return System.currentTimeMillis() - (1000 * seconds);
+	verify(writeback).execute("a");
+	verify(writeback).execute("b");
     }
 
     @Test
-    public void canNotReturnKeysTimeOvered_NotChanged() {
+    public void shouldNotApplyFunctionWhenNotChangedAfterWritebacking() {
 	sut = new LRUKeyUpdateTime(removalListener);
 	sut.notifyUpdated("a", secondsAgo(65));
 	sut.notifyWritebacked("a", secondsAgo(64));
 
-	List<String> result = sut.findKeysOverThan(1000 * 60);
+	sut.applyToKeysOverThan(1000 * 60, writeback, false);
 
-	assertThat(result.size(), is(0));
+	verifyZeroInteractions(writeback);
+    }
+
+    @MultiThreadTest
+    @Test
+    public void findingShouldBeSafeWhenOtherThreadsUpdateMap()
+	    throws InterruptedException {
+	final int notifierCount = 10;
+	final int writebackerCount = 1;
+	sut = new LRUKeyUpdateTime(removalListener);
+
+	ExecutorService executors = Executors.newFixedThreadPool(notifierCount
+		+ writebackerCount);
+	for (int i = 0; i < notifierCount; i++) {
+	    executors.submit(new Runnable() {
+		public void run() {
+		    for (int i = 0; i < 5000; i++) {
+			sut.notifyUpdated("K" + new Random().nextInt(),
+				System.currentTimeMillis());
+		    }
+		}
+	    });
+	}
+
+	executors.submit(new Runnable() {
+	    public void run() {
+		for (int i = 0; i < 100; i++) {
+		    sut.applyToKeysOverThan(0, writeback, false);
+		}
+	    }
+	});
+
+	executors.shutdown();
+	executors.awaitTermination(60, TimeUnit.SECONDS);
+    }
+
+    private long secondsAgo(int seconds) {
+	return System.currentTimeMillis() - (1000 * seconds);
     }
 }

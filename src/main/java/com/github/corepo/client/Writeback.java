@@ -2,7 +2,7 @@ package com.github.corepo.client;
 
 import java.util.Arrays;
 
-public class Writeback {
+public class Writeback implements KeyFunction {
     private CoRepository coRepository;
     private OriginalRepository originalRepository;
 
@@ -12,7 +12,7 @@ public class Writeback {
 	this.originalRepository = originalRepository;
     }
 
-    public void writeback(String key) {
+    public void execute(String key) {
 	if (coRepository.exists(key) == false) {
 	    return;
 	}
