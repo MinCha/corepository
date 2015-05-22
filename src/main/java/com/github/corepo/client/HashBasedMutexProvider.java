@@ -9,17 +9,17 @@ class HashBasedMutexProvider {
     private int dispersion;
 
     HashBasedMutexProvider() {
-	this(DEFAULT_DISPERSION);
+        this(DEFAULT_DISPERSION);
     }
 
     HashBasedMutexProvider(int dispersion) {
-	this.dispersion = dispersion;
-	for (int i = 0; i < dispersion; i++) {
-	    mutexes.add(new Object());
-	}
+        this.dispersion = dispersion;
+        for (int i = 0; i < dispersion; i++) {
+            mutexes.add(new Object());
+        }
     }
 
     Object get(Object key) {
-	return mutexes.get(Math.abs(key.hashCode() % dispersion));
+        return mutexes.get(Math.abs(key.hashCode() % dispersion));
     }
 }

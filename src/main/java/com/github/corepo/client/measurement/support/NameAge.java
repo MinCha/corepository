@@ -1,8 +1,8 @@
 package com.github.corepo.client.measurement.support;
 
-import java.io.Serializable;
-
 import com.github.corepo.client.BaseObject;
+
+import java.io.Serializable;
 
 @SuppressWarnings("serial")
 public class NameAge extends BaseObject implements Serializable {
@@ -10,15 +10,15 @@ public class NameAge extends BaseObject implements Serializable {
     private int age;
 
     public NameAge(String name, int age) {
-	this.name = name;
-	this.age = age;
+        this.name = name;
+        this.age = age;
     }
 
     public String getName() {
-	return name;
+        return name;
     }
 
     public int getAge() {
-	return age;
+        return age;
     }
 }

@@ -9,41 +9,41 @@ public class Item extends BaseObject implements Serializable {
     private boolean integer = false;
 
     public Item(String key, Object value) {
-	this.key = key;
-	this.value = value;
+        this.key = key;
+        this.value = value;
     }
 
     public Item(String key, Integer value) {
-	this.key = key;
-	this.value = value;
-	this.integer = true;
+        this.key = key;
+        this.value = value;
+        this.integer = true;
     }
 
     public String getKey() {
-	return key;
+        return key;
     }
 
     public Object getValue() {
-	return value;
+        return value;
     }
 
     public String getValueAsString() {
-	return (String) value;
+        return (String) value;
     }
 
     public int getValueAsInt() {
-	return (Integer) value;
+        return (Integer) value;
     }
 
     public boolean isInteger() {
-	return integer;
+        return integer;
     }
 
     public boolean isNotFound() {
-	return value == null;
+        return value == null;
     }
 
     public static Item withNoValue(String key) {
-	return new Item(key, null);
+        return new Item(key, null);
     }
 }

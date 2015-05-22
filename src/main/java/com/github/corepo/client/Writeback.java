@@ -7,22 +7,22 @@ public class Writeback implements KeyFunction {
     private OriginalRepository originalRepository;
 
     public Writeback(CoRepository coRepository,
-	    OriginalRepository originalRepository) {
-	this.coRepository = coRepository;
-	this.originalRepository = originalRepository;
+                     OriginalRepository originalRepository) {
+        this.coRepository = coRepository;
+        this.originalRepository = originalRepository;
     }
 
     public void execute(String key) {
-	if (coRepository.exists(key) == false) {
-	    return;
-	}
+        if (coRepository.exists(key) == false) {
+            return;
+        }
 
-	if (coRepository.isInt(key)) {
-	    originalRepository.writeback(Arrays.asList(coRepository
-		    .selectAsInt(key)));
-	} else {
-	    originalRepository.writeback(Arrays.asList(coRepository
-		    .selectAsObject(key)));
-	}
+        if (coRepository.isInt(key)) {
+            originalRepository.writeback(Arrays.asList(coRepository
+                    .selectAsInt(key)));
+        } else {
+            originalRepository.writeback(Arrays.asList(coRepository
+                    .selectAsObject(key)));
+        }
     }
 }

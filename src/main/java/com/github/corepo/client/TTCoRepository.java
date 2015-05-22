@@ -13,87 +13,87 @@ public class TTCoRepository implements CoRepository {
     private final IntegerTranscoder integerTranscoder = new IntegerTranscoder();
 
     public TTCoRepository(String ip, int port) throws Exception {
-	tt = new MRDB();
-	tt.setGlobalTimeout(2000);
-	tt.open(NodeAddress.addresses("tcp://" + ip + ":" + port));
+        tt = new MRDB();
+        tt.setGlobalTimeout(2000);
+        tt.open(NodeAddress.addresses("tcp://" + ip + ":" + port));
     }
 
     public TTCoRepository(MRDB tt) {
-	this.tt = tt;
+        this.tt = tt;
     }
 
     public void update(Item item) {
-	insert(item);
+        insert(item);
     }
 
     public void insert(Item item) {
-	if (item.isInteger()) {
-	    tt.await(tt.put(item.getKey(), item.getValueAsInt(),
-		    integerTranscoder));
-	} else {
-	    tt.await(tt.put(item.getKey(), item.getValue()));
-	}
+        if (item.isInteger()) {
+            tt.await(tt.put(item.getKey(), item.getValueAsInt(),
+                    integerTranscoder));
+        } else {
+            tt.await(tt.put(item.getKey(), item.getValue()));
+        }
     }
 
     public int increase(String key) {
-	int result = tt.await(tt.addint(key, 1));
-	return result;
+        int result = tt.await(tt.addint(key, 1));
+        return result;
     }
 
     public int decrease(String key) {
-	int result = tt.await(tt.addint(key, -1));
-	return result;
+        int result = tt.await(tt.addint(key, -1));
+        return result;
     }
 
     public boolean exists(String key) {
-	return tt.await(tt.get(key, new StringTranscoder())) != null;
+        return tt.await(tt.get(key, new StringTranscoder())) != null;
     }
 
     public boolean lock(String key) {
-	final int winner = 1;
-	int result = increase(LOCK_KEY_PREFIX + key);
-	return winner == result;
+        final int winner = 1;
+        int result = increase(LOCK_KEY_PREFIX + key);
+        return winner == result;
     }
 
     public boolean unlock(String key) {
-	return delete(LOCK_KEY_PREFIX + key);
+        return delete(LOCK_KEY_PREFIX + key);
     }
 
     public boolean delete(String key) {
-	return tt.await(tt.out(key));
+        return tt.await(tt.out(key));
     }
 
     public Item selectAsObject(String key) {
-	Object value = tt.await(tt.get(key));
-	if (value == null) {
-	    return Item.withNoValue(key);
-	}
-	return new Item(key, value);
+        Object value = tt.await(tt.get(key));
+        if (value == null) {
+            return Item.withNoValue(key);
+        }
+        return new Item(key, value);
     }
 
     public Item selectAsInt(String key) {
-	Object value = tt.await(tt.get(key, integerTranscoder));
-	if (value == null) {
-	    return Item.withNoValue(key);
-	}
-	return new Item(key, (Integer) value);
+        Object value = tt.await(tt.get(key, integerTranscoder));
+        if (value == null) {
+            return Item.withNoValue(key);
+        }
+        return new Item(key, (Integer) value);
     }
 
     public boolean isInt(String key) {
-	try {
-	    selectAsInt(key);
-	    return true;
-	} catch (Exception e) {
-	    return false;
-	}
+        try {
+            selectAsInt(key);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public void close() {
-	tt.close();
-	connected = false;
+        tt.close();
+        connected = false;
     }
 
     public boolean isConnected() {
-	return connected;
+        return connected;
     }
 }

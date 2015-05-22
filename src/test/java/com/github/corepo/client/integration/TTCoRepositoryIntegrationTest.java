@@ -1,25 +1,22 @@
 package com.github.corepo.client.integration;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
-
+import com.github.corepo.client.CoRepository;
+import com.github.corepo.client.TTCoRepository;
 import org.junit.Ignore;
 import org.junit.Test;
-
 import tokyotyrant.MRDB;
 import tokyotyrant.networking.NodeAddress;
 import tokyotyrant.transcoder.StringTranscoder;
 
-import com.github.corepo.client.CoRepository;
-import com.github.corepo.client.TTCoRepository;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertThat;
 
 /**
  * You need running TT server for executing this test because this is an
  * integration test with TT.
- * 
+ *
  * @author Min Cha
- * 
  */
 @Ignore
 public class TTCoRepositoryIntegrationTest extends CoRepositoryAcceptanceTest {
@@ -30,18 +27,18 @@ public class TTCoRepositoryIntegrationTest extends CoRepositoryAcceptanceTest {
 
     @Override
     protected CoRepository getCoRepository() throws Exception {
-	tt = new MRDB();
-	tt.setGlobalTimeout(2000);
-	tt.open(NodeAddress.addresses("tcp://" + ip + ":" + port));
+        tt = new MRDB();
+        tt.setGlobalTimeout(2000);
+        tt.open(NodeAddress.addresses("tcp://" + ip + ":" + port));
 
-	return new TTCoRepository(tt);
+        return new TTCoRepository(tt);
     }
 
     @Ignore
     @Test
     public void canRunExtOperationWithLockingOption() throws Exception {
-	assertThat(tt.await(tt.ext("tcrdbput", key, "1", 1,
-		new StringTranscoder())), is(notNullValue()));
-	assertThat(tt.await(tt.get(key)), is(notNullValue()));
+        assertThat(tt.await(tt.ext("tcrdbput", key, "1", 1,
+                new StringTranscoder())), is(notNullValue()));
+        assertThat(tt.await(tt.get(key)), is(notNullValue()));
     }
 }

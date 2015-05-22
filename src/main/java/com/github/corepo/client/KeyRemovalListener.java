@@ -4,19 +4,19 @@ import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
 
 public class KeyRemovalListener implements
-	RemovalListener<String, UpdateTime> {
+        RemovalListener<String, UpdateTime> {
     private Writeback writeback;
 
     KeyRemovalListener(Writeback writeback) {
-	this.writeback = writeback;
+        this.writeback = writeback;
     }
 
     public void onRemoval(RemovalNotification<String, UpdateTime> notification) {
-	final String key = getKey(notification);
-	writeback.execute(key);
+        final String key = getKey(notification);
+        writeback.execute(key);
     }
 
     String getKey(RemovalNotification<String, UpdateTime> notification) {
-	return notification.getKey();
+        return notification.getKey();
     }
 }

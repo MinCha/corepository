@@ -5,13 +5,12 @@ package com.github.corepo.client;
  * requests from client instead of original repository. For this reason,
  * CoRepository should able to rapidly handle requests from client. You can read
  * more at https://github.com/MinCha/corepository/wiki
- * 
+ *
+ * @author Min Cha
  * @see LocalMemoryCoRepository
  * @see TTCoRepository
  * @see RedisCoRepository
  * @see CoRepositoryClient
- * @author Min Cha
- * 
  */
 public interface CoRepository {
     Item selectAsObject(String key);

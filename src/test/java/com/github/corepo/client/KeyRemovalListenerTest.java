@@ -1,13 +1,12 @@
 package com.github.corepo.client;
 
-import static org.mockito.Mockito.verify;
-
+import com.google.common.cache.RemovalNotification;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.google.common.cache.RemovalNotification;
+import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class KeyRemovalListenerTest {
@@ -20,15 +19,15 @@ public class KeyRemovalListenerTest {
 
     @Test
     public void shouldWritebackItem() {
-	sut = new KeyRemovalListener(writeback) {
-	    @Override
-	    String getKey(RemovalNotification<String, UpdateTime> notification) {
-		return key;
-	    }
-	};
+        sut = new KeyRemovalListener(writeback) {
+            @Override
+            String getKey(RemovalNotification<String, UpdateTime> notification) {
+                return key;
+            }
+        };
 
-	sut.onRemoval(notification);
+        sut.onRemoval(notification);
 
-	verify(writeback).execute(key);
+        verify(writeback).execute(key);
     }
 }
