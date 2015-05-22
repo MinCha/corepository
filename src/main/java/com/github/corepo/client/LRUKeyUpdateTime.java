@@ -14,14 +14,14 @@ class LRUKeyUpdateTime {
     private static final Logger LOG = LoggerFactory
             .getLogger(LRUKeyUpdateTime.class);
     private final static long DEFAULT_SIZE = 10000;
-    private Cache<String, UpdateTime> lastUpdated;
-    private Cache<String, UpdateTime> lastWritebacked;
+    private Cache<ItemKey, UpdateTime> lastUpdated;
+    private Cache<ItemKey, UpdateTime> lastWritebacked;
 
-    LRUKeyUpdateTime(RemovalListener<String, UpdateTime> removalListener) {
+    LRUKeyUpdateTime(RemovalListener<ItemKey, UpdateTime> removalListener) {
         this(removalListener, DEFAULT_SIZE);
     }
 
-    LRUKeyUpdateTime(RemovalListener<String, UpdateTime> removalListener,
+    LRUKeyUpdateTime(RemovalListener<ItemKey, UpdateTime> removalListener,
                      long size) {
         this.lastUpdated = CacheBuilder.newBuilder().maximumSize(size)
                 .removalListener(removalListener).build();
@@ -29,7 +29,7 @@ class LRUKeyUpdateTime {
                 .build();
     }
 
-    void notifyUpdated(String key, long updatedTime) {
+    void notifyUpdated(ItemKey key, long updatedTime) {
         UpdateTime old = lastUpdated.getIfPresent(key);
 
         if (old == null) {
@@ -44,25 +44,25 @@ class LRUKeyUpdateTime {
         }
     }
 
-    void notifyWritebacked(String key, long writebackedTime) {
+    void notifyWritebacked(ItemKey key, long writebackedTime) {
         lastWritebacked.put(key, new UpdateTime(writebackedTime));
     }
 
-    boolean isUpdated(String key) {
+    boolean isUpdated(ItemKey key) {
         return lastUpdated.getIfPresent(key) != null;
     }
 
-    boolean isWritebacked(String key) {
+    boolean isWritebacked(ItemKey key) {
         return lastWritebacked.getIfPresent(key) != null;
     }
 
-    boolean exists(String key) {
+    boolean exists(ItemKey key) {
         return isUpdated(key);
     }
 
     void applyToKeysOverThan(long timeInMillis, KeyFunction function,
                              boolean logAsWritebacked) {
-        for (String key : lastUpdated.asMap().keySet()) {
+        for (ItemKey key : lastUpdated.asMap().keySet()) {
             long current = System.currentTimeMillis();
             UpdateTime writebackedTime = lastWritebacked.getIfPresent(key);
             UpdateTime updateedTime = lastUpdated.getIfPresent(key);
@@ -82,9 +82,9 @@ class LRUKeyUpdateTime {
         }
     }
 
-    Set<String> findAllKeys() {
+    Set<ItemKey> findAllKeys() {
         if (lastUpdated == null) {
-            return new HashSet<String>();
+            return new HashSet<ItemKey>();
         }
 
         return lastUpdated.asMap().keySet();

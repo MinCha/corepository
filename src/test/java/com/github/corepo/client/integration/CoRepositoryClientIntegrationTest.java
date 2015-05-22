@@ -26,7 +26,7 @@ public class CoRepositoryClientIntegrationTest {
     public void watingThreadsShouldReciveTimeoutException_WhenThereIsNoKeyOnOriginalRepository() {
         sut = new CoRepositoryClient(localMemory,
                 new NagativeOriginalRepository());
-        final String key = "non-existing";
+        final ItemKey key = new ItemKey("non-existing");
         final int clientCount = 500;
         ExecutorService executors = Executors.newFixedThreadPool(1000);
         List<Callable<Boolean>> tasks = new ArrayList<Callable<Boolean>>();
@@ -64,7 +64,7 @@ public class CoRepositoryClientIntegrationTest {
         sut = new CoRepositoryClient(localMemory,
                 new PossitiveOriginalRepository());
         for (int i = 0; i < 100000; i++) {
-            sut.update(new Item("K" + i, 0));
+            sut.update(new Item(new ItemKey("K" + i), 0));
         }
 
         sut.close();

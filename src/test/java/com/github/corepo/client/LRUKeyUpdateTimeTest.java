@@ -23,20 +23,20 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 @RunWith(MockitoJUnitRunner.class)
 public class LRUKeyUpdateTimeTest {
     private LRUKeyUpdateTime sut;
-    private final String keyA = "keyA";
-    private final String keyB = "keyB";
-    private final String nokey = "nokey";
+    private final ItemKey keyA = new ItemKey("keyA");
+    private final ItemKey keyB = new ItemKey("keyB");
+    private final ItemKey nokey = new ItemKey("nokey");
     @Mock
-    private RemovalListener<String, UpdateTime> removalListener;
+    private RemovalListener<ItemKey, UpdateTime> removalListener;
     @Mock
     private Writeback writeback;
     private int count = 0;
 
     @Test
     public void removalEventShouldOccurWhenOnlyRemovingItem() {
-        sut = new LRUKeyUpdateTime(new RemovalListener<String, UpdateTime>() {
+        sut = new LRUKeyUpdateTime(new RemovalListener<ItemKey, UpdateTime>() {
             public void onRemoval(
-                    RemovalNotification<String, UpdateTime> notification) {
+                    RemovalNotification<ItemKey, UpdateTime> notification) {
                 count++;
             }
         });
@@ -90,7 +90,7 @@ public class LRUKeyUpdateTimeTest {
         sut.notifyUpdated(keyA, System.currentTimeMillis());
         sut.notifyUpdated(keyB, System.currentTimeMillis());
 
-        Set<String> result = sut.findAllKeys();
+        Set<ItemKey> result = sut.findAllKeys();
 
         assertThat(result.size(), is(2));
         assertThat(result, hasItem(keyA));
@@ -100,21 +100,21 @@ public class LRUKeyUpdateTimeTest {
     @Test
     public void canApplyFunctionToKeysTimeOvered() {
         sut = new LRUKeyUpdateTime(removalListener);
-        sut.notifyUpdated("a", secondsAgo(3));
-        sut.notifyUpdated("b", secondsAgo(3));
-        sut.notifyUpdated("b", secondsAgo(1));
+        sut.notifyUpdated(new ItemKey("a"), secondsAgo(3));
+        sut.notifyUpdated(new ItemKey("b"), secondsAgo(3));
+        sut.notifyUpdated(new ItemKey("b"), secondsAgo(1));
 
         sut.applyToKeysOverThan(2000, writeback, false);
 
-        verify(writeback).execute("a");
-        verify(writeback).execute("b");
+        verify(writeback).execute(new ItemKey("a"));
+        verify(writeback).execute(new ItemKey("b"));
     }
 
     @Test
     public void shouldNotApplyFunctionWhenNotChangedAfterWritebacking() {
         sut = new LRUKeyUpdateTime(removalListener);
-        sut.notifyUpdated("a", secondsAgo(65));
-        sut.notifyWritebacked("a", secondsAgo(64));
+        sut.notifyUpdated(new ItemKey("a"), secondsAgo(65));
+        sut.notifyWritebacked(new ItemKey("a"), secondsAgo(64));
 
         sut.applyToKeysOverThan(1000 * 60, writeback, false);
 
@@ -135,7 +135,7 @@ public class LRUKeyUpdateTimeTest {
             executors.submit(new Runnable() {
                 public void run() {
                     for (int i = 0; i < 5000; i++) {
-                        sut.notifyUpdated("K" + new Random().nextInt(),
+                        sut.notifyUpdated(new ItemKey("K" + new Random().nextInt()),
                                 System.currentTimeMillis());
                     }
                 }

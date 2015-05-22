@@ -29,10 +29,10 @@ public class RedisCoRepository implements CoRepository {
         this.jedisPool = jedis;
     }
 
-    public Item selectAsObject(String key) {
+    public Item selectAsObject(ItemKey key) {
         Jedis jedis = jedisPool.getResource();
         try {
-            byte[] value = jedis.get(key.getBytes());
+            byte[] value = jedis.get(key.getKey().getBytes());
             if (value == null) {
                 return Item.withNoValue(key);
             }
@@ -42,10 +42,10 @@ public class RedisCoRepository implements CoRepository {
         }
     }
 
-    public Item selectAsInt(String key) {
+    public Item selectAsInt(ItemKey key) {
         Jedis jedis = jedisPool.getResource();
         try {
-            String value = jedis.get(key);
+            String value = jedis.get(key.getKey());
             if (value == null) {
                 return Item.withNoValue(key);
             }
@@ -63,65 +63,65 @@ public class RedisCoRepository implements CoRepository {
         Jedis jedis = jedisPool.getResource();
         try {
             if (item.isInteger()) {
-                jedis.set(item.getKey(), String.valueOf(item.getValueAsInt()));
+                jedis.set(item.getItemKeyAsString(), String.valueOf(item.getValueAsInt()));
             } else {
-                jedis.set(item.getKey().getBytes(), serialize(item.getValue()));
+                jedis.set(item.getItemKeyAsString().getBytes(), serialize(item.getValue()));
             }
         } finally {
             jedisPool.returnResource(jedis);
         }
     }
 
-    public int increase(String key) {
+    public int increase(ItemKey key) {
         Jedis jedis = jedisPool.getResource();
         try {
-            return Ints.checkedCast(jedis.incr(key));
+            return Ints.checkedCast(jedis.incr(key.getKey()));
         } finally {
             jedisPool.returnResource(jedis);
         }
     }
 
-    public int decrease(String key) {
+    public int decrease(ItemKey key) {
         Jedis jedis = jedisPool.getResource();
         try {
-            return Ints.checkedCast(jedis.decr(key));
+            return Ints.checkedCast(jedis.decr(key.getKey()));
         } finally {
             jedisPool.returnResource(jedis);
         }
     }
 
-    public boolean exists(String key) {
+    public boolean exists(ItemKey key) {
         Jedis jedis = jedisPool.getResource();
         try {
-            return jedis.exists(key);
+            return jedis.exists(key.getKey());
         } finally {
             jedisPool.returnResource(jedis);
         }
     }
 
-    public boolean delete(String key) {
+    public boolean delete(ItemKey key) {
         Jedis jedis = jedisPool.getResource();
         try {
-            return jedis.del(key) == 1;
+            return jedis.del(key.getKey()) == 1;
         } finally {
             jedisPool.returnResource(jedis);
         }
     }
 
-    public boolean lock(String key) {
+    public boolean lock(ItemKey key) {
         final int winner = 1;
-        int result = increase(LOCK_KEY_PREFIX + key);
+        int result = increase(key.convertToLockedKey());
         if (winner == result) {
             LOG.info(key + " winner");
         }
         return winner == result;
     }
 
-    public boolean unlock(String key) {
-        return delete(LOCK_KEY_PREFIX + key);
+    public boolean unlock(ItemKey key) {
+        return delete(key.convertToLockedKey());
     }
 
-    public boolean isInt(String key) {
+    public boolean isInt(ItemKey key) {
         try {
             selectAsInt(key);
             return true;

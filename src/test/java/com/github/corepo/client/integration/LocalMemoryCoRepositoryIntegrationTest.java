@@ -1,9 +1,6 @@
 package com.github.corepo.client.integration;
 
-import com.github.corepo.client.CoRepository;
-import com.github.corepo.client.Item;
-import com.github.corepo.client.LocalMemoryCoRepository;
-import com.github.corepo.client.NotNumericValueException;
+import com.github.corepo.client.*;
 import org.junit.Test;
 
 import static org.hamcrest.Matchers.is;
@@ -16,11 +13,11 @@ public class LocalMemoryCoRepositoryIntegrationTest extends
         final String keyPrefix = "domain key is ";
         final int oneMillion = 100 * 10000;
         for (int i = 0; i < oneMillion; i++) {
-            sut.insert(new Item(keyPrefix + i, i));
+            sut.insert(new Item(new ItemKey(keyPrefix + i), i));
         }
 
-        assertThat(sut.selectAsInt(keyPrefix + "0").getValueAsInt(), is(0));
-        assertThat(sut.selectAsInt(keyPrefix + oneMillion / 2).getValueAsInt(),
+        assertThat(sut.selectAsInt(new ItemKey(keyPrefix + "0")).getValueAsInt(), is(0));
+        assertThat(sut.selectAsInt(new ItemKey(keyPrefix + oneMillion / 2)).getValueAsInt(),
                 is(oneMillion / 2));
     }
 

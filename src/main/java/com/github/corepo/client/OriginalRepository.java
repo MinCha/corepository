@@ -15,7 +15,7 @@ import java.util.List;
  * @author Min Cha
  */
 public interface OriginalRepository {
-    Item read(String key);
+    Item read(ItemKey key);
 
     void writeback(List<Item> items);
 }

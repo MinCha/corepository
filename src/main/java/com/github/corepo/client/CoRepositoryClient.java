@@ -30,30 +30,30 @@ public class CoRepositoryClient {
         this(coRepository, originalRepository, 1000 * 60 * 5);
     }
 
-    public Item selectAsObject(String key) {
+    public Item selectAsObject(ItemKey key) {
         puller.ensurePulled(key);
         return coRepository.selectAsObject(key);
     }
 
-    public Item selectAsInt(String key) {
+    public Item selectAsInt(ItemKey key) {
         puller.ensurePulled(key);
         Item result = coRepository.selectAsInt(key);
         return result;
     }
 
     public void update(Item item) {
-        puller.ensurePulled(item.getKey());
+        puller.ensurePulled(item.getItemKey());
         coRepository.update(item);
-        keyUpdateTime.notifyUpdated(item.getKey(), System.currentTimeMillis());
+        keyUpdateTime.notifyUpdated(item.getItemKey(), System.currentTimeMillis());
     }
 
-    public int increase(String key) {
+    public int increase(ItemKey key) {
         puller.ensurePulled(key);
         keyUpdateTime.notifyUpdated(key, System.currentTimeMillis());
         return coRepository.increase(key);
     }
 
-    public int decrease(String key) {
+    public int decrease(ItemKey key) {
         puller.ensurePulled(key);
         keyUpdateTime.notifyUpdated(key, System.currentTimeMillis());
         return coRepository.decrease(key);

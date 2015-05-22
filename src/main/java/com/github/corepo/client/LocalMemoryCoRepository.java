@@ -17,18 +17,18 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Min Cha
  */
 public class LocalMemoryCoRepository implements CoRepository {
-    private Map<String, Object> locks = new ConcurrentHashMap<String, Object>();
-    private Map<String, Object> items = new ConcurrentHashMap<String, Object>();
+    private Map<ItemKey, Object> locks = new ConcurrentHashMap<ItemKey, Object>();
+    private Map<ItemKey, Object> items = new ConcurrentHashMap<ItemKey, Object>();
     private HashBasedMutexProvider mutex = new HashBasedMutexProvider();
     private boolean connected = true;
 
     public void update(Item item) {
-        synchronized (mutex.get(item.getKey())) {
-            items.put(item.getKey(), item.getValue());
+        synchronized (mutex.get(item.getItemKey())) {
+            items.put(item.getItemKey(), item.getValue());
         }
     }
 
-    public int increase(String key) {
+    public int increase(ItemKey key) {
         synchronized (mutex.get(key)) {
             int value = 0;
             try {
@@ -45,7 +45,7 @@ public class LocalMemoryCoRepository implements CoRepository {
         }
     }
 
-    public int decrease(String key) {
+    public int decrease(ItemKey key) {
         synchronized (mutex.get(key)) {
             int value = 0;
             try {
@@ -63,12 +63,12 @@ public class LocalMemoryCoRepository implements CoRepository {
     }
 
     public void insert(Item item) {
-        synchronized (mutex.get(item.getKey())) {
-            items.put(item.getKey(), item.getValue());
+        synchronized (mutex.get(item.getItemKeyAsString())) {
+            items.put(item.getItemKey(), item.getValue());
         }
     }
 
-    public boolean exists(String key) {
+    public boolean exists(ItemKey key) {
         return items.containsKey(key);
     }
 
@@ -83,7 +83,7 @@ public class LocalMemoryCoRepository implements CoRepository {
         return value;
     }
 
-    public boolean lock(String key) {
+    public boolean lock(ItemKey key) {
         synchronized (mutex.get(key)) {
             if (locks.containsKey(key)) {
                 return false;
@@ -94,7 +94,7 @@ public class LocalMemoryCoRepository implements CoRepository {
         }
     }
 
-    public boolean unlock(String key) {
+    public boolean unlock(ItemKey key) {
         if (locks.containsKey(key)) {
             locks.remove(key);
             return true;
@@ -103,11 +103,11 @@ public class LocalMemoryCoRepository implements CoRepository {
         }
     }
 
-    public boolean delete(String key) {
+    public boolean delete(ItemKey key) {
         return items.remove(key) != null;
     }
 
-    public Item selectAsObject(String key) {
+    public Item selectAsObject(ItemKey key) {
         if (items.containsKey(key) == false) {
             return Item.withNoValue(key);
         }
@@ -115,7 +115,7 @@ public class LocalMemoryCoRepository implements CoRepository {
         return new Item(key, items.get(key));
     }
 
-    public Item selectAsInt(String key) {
+    public Item selectAsInt(ItemKey key) {
         if (items.containsKey(key) == false) {
             return Item.withNoValue(key);
         }
@@ -124,7 +124,7 @@ public class LocalMemoryCoRepository implements CoRepository {
         return new Item(key, value);
     }
 
-    public boolean isInt(String key) {
+    public boolean isInt(ItemKey key) {
         return items.get(key) instanceof Integer;
     }
 

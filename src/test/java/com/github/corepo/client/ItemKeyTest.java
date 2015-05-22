@@ -46,4 +46,14 @@ public class ItemKeyTest {
 
         assertThat(sut.getKey(), is(nameSpace + ItemKey.KEY_DELIM + id));
     }
+
+    @Test
+    public void canGenerateLockKey() {
+        final String nameSpace = "following";
+        final String id = "1";
+
+        sut = new ItemKey(nameSpace, id).convertToLockedKey();
+
+        assertThat(sut.getKey(), is(ItemKey.LOCK_PREFIX + nameSpace + ItemKey.KEY_DELIM + id));
+    }
 }

@@ -1,6 +1,7 @@
 package com.github.corepo.client.measurement.support;
 
 import com.github.corepo.client.Item;
+import com.github.corepo.client.ItemKey;
 import com.github.corepo.client.OriginalRepository;
 
 import java.util.List;
@@ -12,8 +13,8 @@ public class VisitationOriginalRepository implements OriginalRepository {
         this.visitationDAO = visitationDAO;
     }
 
-    public Item read(String key) {
-        int value = visitationDAO.selectVisitationCount((String) key);
+    public Item read(ItemKey key) {
+        int value = visitationDAO.selectVisitationCount(key);
         return new Item(key, value);
     }
 
@@ -22,7 +23,7 @@ public class VisitationOriginalRepository implements OriginalRepository {
 
     public void writeback(List<Item> items) {
         for (Item each : items) {
-            visitationDAO.updateVisitionCount(each.getKey(),
+            visitationDAO.updateVisitionCount(each.getItemKey(),
                     each.getValueAsInt());
         }
     }

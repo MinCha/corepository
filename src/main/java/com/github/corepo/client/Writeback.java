@@ -12,7 +12,7 @@ public class Writeback implements KeyFunction {
         this.originalRepository = originalRepository;
     }
 
-    public void execute(String key) {
+    public void execute(ItemKey key) {
         if (coRepository.exists(key) == false) {
             return;
         }

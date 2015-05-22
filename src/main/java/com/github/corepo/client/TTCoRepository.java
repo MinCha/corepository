@@ -28,42 +28,42 @@ public class TTCoRepository implements CoRepository {
 
     public void insert(Item item) {
         if (item.isInteger()) {
-            tt.await(tt.put(item.getKey(), item.getValueAsInt(),
+            tt.await(tt.put(item.getItemKeyAsString(), item.getValueAsInt(),
                     integerTranscoder));
         } else {
-            tt.await(tt.put(item.getKey(), item.getValue()));
+            tt.await(tt.put(item.getItemKeyAsString(), item.getValue()));
         }
     }
 
-    public int increase(String key) {
+    public int increase(ItemKey key) {
         int result = tt.await(tt.addint(key, 1));
         return result;
     }
 
-    public int decrease(String key) {
+    public int decrease(ItemKey key) {
         int result = tt.await(tt.addint(key, -1));
         return result;
     }
 
-    public boolean exists(String key) {
+    public boolean exists(ItemKey key) {
         return tt.await(tt.get(key, new StringTranscoder())) != null;
     }
 
-    public boolean lock(String key) {
+    public boolean lock(ItemKey key) {
         final int winner = 1;
-        int result = increase(LOCK_KEY_PREFIX + key);
+        int result = increase(key.convertToLockedKey());
         return winner == result;
     }
 
-    public boolean unlock(String key) {
-        return delete(LOCK_KEY_PREFIX + key);
+    public boolean unlock(ItemKey key) {
+        return delete(key.convertToLockedKey());
     }
 
-    public boolean delete(String key) {
+    public boolean delete(ItemKey key) {
         return tt.await(tt.out(key));
     }
 
-    public Item selectAsObject(String key) {
+    public Item selectAsObject(ItemKey key) {
         Object value = tt.await(tt.get(key));
         if (value == null) {
             return Item.withNoValue(key);
@@ -71,7 +71,7 @@ public class TTCoRepository implements CoRepository {
         return new Item(key, value);
     }
 
-    public Item selectAsInt(String key) {
+    public Item selectAsInt(ItemKey key) {
         Object value = tt.await(tt.get(key, integerTranscoder));
         if (value == null) {
             return Item.withNoValue(key);
@@ -79,7 +79,7 @@ public class TTCoRepository implements CoRepository {
         return new Item(key, (Integer) value);
     }
 
-    public boolean isInt(String key) {
+    public boolean isInt(ItemKey key) {
         try {
             selectAsInt(key);
             return true;

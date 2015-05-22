@@ -1,17 +1,19 @@
 package com.github.corepo.client.measurement.support;
 
+import com.github.corepo.client.ItemKey;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class VisitationDAO {
-    private Map<String, Integer> table = new HashMap<String, Integer>();
+    private Map<ItemKey, Integer> table = new HashMap<ItemKey, Integer>();
 
-    public int selectVisitationCount(String id) {
+    public int selectVisitationCount(ItemKey id) {
         Integer result = table.get(id);
         return result == null ? 0 : result;
     }
 
-    public void updateVisitionCount(String key, int value) {
-        table.put((String) key, value);
+    public void updateVisitionCount(ItemKey key, int value) {
+        table.put(key, value);
     }
 }

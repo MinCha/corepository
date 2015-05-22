@@ -8,7 +8,7 @@ public class WritebackEventNotifier implements KeyFunction {
         this.keyUpdateTime = keyUpdateTime;
     }
 
-    public void execute(String key) {
+    public void execute(ItemKey key) {
         keyUpdateTime.notifyWritebacked(key, System.currentTimeMillis());
     }
 }

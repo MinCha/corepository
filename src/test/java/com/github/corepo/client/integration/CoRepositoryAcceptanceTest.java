@@ -25,12 +25,12 @@ public abstract class CoRepositoryAcceptanceTest {
 
     protected final OriginalRepository originalRepository = new VisitationOriginalRepository(
             new VisitationDAO());
-    protected final String key = "key" + System.currentTimeMillis();
-    protected final String keyForLockA = "keyA" + System.currentTimeMillis();
-    protected final String keyForLockB = "keyB" + System.currentTimeMillis();
-    protected final String noKey = "noKey" + System.currentTimeMillis();
-    protected final String intKey = "int" + System.currentTimeMillis();
-    protected final String stringKey = "string" + System.currentTimeMillis();
+    protected final ItemKey key = new ItemKey("key" + System.currentTimeMillis());
+    protected final ItemKey keyForLockA = new ItemKey("keyA" + System.currentTimeMillis());
+    protected final ItemKey keyForLockB = new ItemKey("keyB" + System.currentTimeMillis());
+    protected final ItemKey noKey = new ItemKey("noKey" + System.currentTimeMillis());
+    protected final ItemKey intKey = new ItemKey("int" + System.currentTimeMillis());
+    protected final ItemKey stringKey = new ItemKey("string" + System.currentTimeMillis());
     private int lockedCount = 0;
 
     protected abstract CoRepository getCoRepository() throws Exception;
@@ -42,7 +42,7 @@ public abstract class CoRepositoryAcceptanceTest {
 
         Item result = sut.selectAsInt(key);
 
-        assertThat(result.getKey(), is(key));
+        assertThat(result.getItemKey(), is(key));
         assertThat(result.getValueAsInt(), is(value));
     }
 
@@ -78,7 +78,7 @@ public abstract class CoRepositoryAcceptanceTest {
 
         Item result = sut.selectAsObject(key);
 
-        assertThat(result.getKey(), is(key));
+        assertThat(result.getItemKey(), is(key));
         assertThat(result.getValueAsString(), is(value));
     }
 
@@ -91,7 +91,7 @@ public abstract class CoRepositoryAcceptanceTest {
         sut.update(new Item(key, newValue));
 
         Item result = sut.selectAsInt(key);
-        assertThat(result.getKey(), is(key));
+        assertThat(result.getItemKey(), is(key));
         assertThat(result.getValueAsInt(), is(newValue));
     }
 
@@ -103,7 +103,7 @@ public abstract class CoRepositoryAcceptanceTest {
         sut.increase(key);
 
         Item result = sut.selectAsInt(key);
-        assertThat(result.getKey(), is(key));
+        assertThat(result.getItemKey(), is(key));
         assertThat(result.getValueAsInt(), is(value + 1));
     }
 
@@ -112,7 +112,7 @@ public abstract class CoRepositoryAcceptanceTest {
         sut.increase(noKey);
 
         Item result = sut.selectAsInt(noKey);
-        assertThat(result.getKey(), is(noKey));
+        assertThat(result.getItemKey(), is(noKey));
         assertThat(result.getValueAsInt(), is(1));
     }
 
@@ -124,7 +124,7 @@ public abstract class CoRepositoryAcceptanceTest {
         sut.decrease(key);
 
         Item result = sut.selectAsInt(key);
-        assertThat(result.getKey(), is(key));
+        assertThat(result.getItemKey(), is(key));
         assertThat(result.getValueAsInt(), is(value - 1));
     }
 
@@ -133,7 +133,7 @@ public abstract class CoRepositoryAcceptanceTest {
         sut.decrease(noKey);
 
         Item result = sut.selectAsInt(noKey);
-        assertThat(result.getKey(), is(noKey));
+        assertThat(result.getItemKey(), is(noKey));
         assertThat(result.getValueAsInt(), is(-1));
     }
 
@@ -221,7 +221,7 @@ public abstract class CoRepositoryAcceptanceTest {
         increaseAndDecreaseByMultiThreadsOn(noKey);
     }
 
-    private void increaseAndDecreaseByMultiThreadsOn(final String passedKey)
+    private void increaseAndDecreaseByMultiThreadsOn(final ItemKey passedKey)
             throws InterruptedException {
         final int clientCount = 150;
         final int callCount = 150;
@@ -263,7 +263,7 @@ public abstract class CoRepositoryAcceptanceTest {
         for (int count = 0; count < 1; count++) {
             final int clientCount = 100;
             final int callCount = 100;
-            final String currentKey = key + System.currentTimeMillis();
+            final ItemKey currentKey = new ItemKey(key.getId() + System.currentTimeMillis());
             ExecutorService executors = Executors
                     .newFixedThreadPool(clientCount);
 
@@ -297,8 +297,8 @@ public abstract class CoRepositoryAcceptanceTest {
     public void clear() {
         sut.delete(key);
         sut.delete(noKey);
-        sut.delete(TTCoRepository.LOCK_KEY_PREFIX + keyForLockA);
-        sut.delete(TTCoRepository.LOCK_KEY_PREFIX + keyForLockB);
+        sut.delete(keyForLockA.convertToLockedKey());
+        sut.delete(keyForLockB.convertToLockedKey());
         sut.delete(stringKey);
         sut.delete(intKey);
     }

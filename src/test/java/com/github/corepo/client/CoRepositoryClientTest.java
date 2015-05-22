@@ -16,8 +16,8 @@ import static org.mockito.Mockito.*;
 public class CoRepositoryClientTest {
     private CoRepositoryClient sut;
 
-    private final String key = "key";
-    private final String noKey = "noKey";
+    private final ItemKey key = new ItemKey("key");
+    private final ItemKey noKey = new ItemKey("noKey");
     private final Item integerItem = new Item(key, 3);
     private final Item stringItem = new Item(key, "3");
     @Mock

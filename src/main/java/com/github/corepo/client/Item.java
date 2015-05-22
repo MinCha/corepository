@@ -4,23 +4,23 @@ import java.io.Serializable;
 
 public class Item extends BaseObject implements Serializable {
     private static final long serialVersionUID = 8494719821834512432L;
-    private String key;
+    private ItemKey key;
     private Object value;
     private boolean integer = false;
 
-    public Item(String key, Object value) {
+    public Item(ItemKey key, Object value) {
         this.key = key;
         this.value = value;
     }
 
-    public Item(String key, Integer value) {
+    public Item(ItemKey key, Integer value) {
         this.key = key;
         this.value = value;
         this.integer = true;
     }
 
-    public String getKey() {
-        return key;
+    public String getItemKeyAsString() {
+        return key.getKey();
     }
 
     public Object getValue() {
@@ -43,7 +43,11 @@ public class Item extends BaseObject implements Serializable {
         return value == null;
     }
 
-    public static Item withNoValue(String key) {
+    public static Item withNoValue(ItemKey key) {
         return new Item(key, null);
+    }
+
+    public ItemKey getItemKey() {
+        return key;
     }
 }

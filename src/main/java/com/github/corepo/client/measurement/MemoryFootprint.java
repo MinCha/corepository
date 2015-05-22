@@ -1,9 +1,6 @@
 package com.github.corepo.client.measurement;
 
-import com.github.corepo.client.CoRepository;
-import com.github.corepo.client.CoRepositoryClient;
-import com.github.corepo.client.Item;
-import com.github.corepo.client.TTCoRepository;
+import com.github.corepo.client.*;
 import com.github.corepo.client.measurement.support.PossitiveOriginalRepository;
 
 import java.util.ArrayList;
@@ -54,7 +51,7 @@ public class MemoryFootprint {
             tasks.add(new Callable<Boolean>() {
                 public Boolean call() throws Exception {
                     for (int j = 0; j < 100; j++) {
-                        client.update(new Item("K" + keyIndex.addAndGet(1), 0));
+                        client.update(new Item(new ItemKey("K" + keyIndex.addAndGet(1)), 0));
                     }
                     return Boolean.TRUE;
                 }

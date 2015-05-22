@@ -21,7 +21,7 @@ class InitialValuePuller {
         this.keyUpdateTime = keyUpdateTime;
     }
 
-    void ensurePulled(String key) {
+    void ensurePulled(ItemKey key) {
         if (keyUpdateTime.exists(key)) {
             return;
         }
@@ -52,7 +52,7 @@ class InitialValuePuller {
         }
     }
 
-    private void waitUntilInitialValueIsPulled(String key) {
+    private void waitUntilInitialValueIsPulled(ItemKey key) {
         int waitingTime = 0;
         synchronized (mutex.get(key)) {
             while (coRepository.exists(key) == false) {

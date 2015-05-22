@@ -1,9 +1,6 @@
 package com.github.corepo.client.measurement;
 
-import com.github.corepo.client.CoRepository;
-import com.github.corepo.client.CoRepositoryClient;
-import com.github.corepo.client.Item;
-import com.github.corepo.client.LocalMemoryCoRepository;
+import com.github.corepo.client.*;
 import com.github.corepo.client.measurement.support.VisitationDAO;
 import com.github.corepo.client.measurement.support.VisitationOriginalRepository;
 
@@ -36,10 +33,10 @@ public class CoRepositoryClientVSCoRepository {
         long current = System.currentTimeMillis();
 
         for (int i = 0; i < count; i++) {
-            client.update(new Item("K" + i, i));
+            client.update(new Item(new ItemKey("K" + i), i));
         }
         for (int i = 0; i < count; i++) {
-            client.selectAsInt("K" + i);
+            client.selectAsInt(new ItemKey("K" + i));
         }
 
         System.out.println("First Touch CorepositoryClient Time : "
@@ -48,10 +45,10 @@ public class CoRepositoryClientVSCoRepository {
         current = System.currentTimeMillis();
 
         for (int i = 0; i < count; i++) {
-            coRepository.update(new Item("K2" + i, i));
+            coRepository.update(new Item(new ItemKey("K2" + i), i));
         }
         for (int i = 0; i < count; i++) {
-            coRepository.selectAsInt("K2" + i);
+            coRepository.selectAsInt(new ItemKey("K2" + i));
         }
 
         System.out.println("First Touch Corepository Time : "
@@ -68,10 +65,10 @@ public class CoRepositoryClientVSCoRepository {
         long current = System.currentTimeMillis();
 
         for (int i = 0; i < count; i++) {
-            client.update(new Item("K" + i, i));
+            client.update(new Item(new ItemKey("K" + i), i));
         }
         for (int i = 0; i < count; i++) {
-            client.selectAsInt("K" + i);
+            client.selectAsInt(new ItemKey("K" + i));
         }
 
         System.out.println("Second Touch CorepositoryClient Time : "
@@ -80,10 +77,10 @@ public class CoRepositoryClientVSCoRepository {
         current = System.currentTimeMillis();
 
         for (int i = 0; i < count; i++) {
-            coRepository.update(new Item("K2" + i, i));
+            coRepository.update(new Item(new ItemKey("K2" + i), i));
         }
         for (int i = 0; i < count; i++) {
-            coRepository.selectAsInt("K2" + i);
+            coRepository.selectAsInt(new ItemKey("K2" + i));
         }
 
         System.out.println("Second Corepository Time : "

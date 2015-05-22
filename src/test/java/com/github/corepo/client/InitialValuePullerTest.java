@@ -10,7 +10,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class InitialValuePullerTest {
     private InitialValuePuller sut;
-    private final String key = "key";
+    private final ItemKey key = new ItemKey("key");
     @Mock
     private CoRepository coRepository;
     @Mock

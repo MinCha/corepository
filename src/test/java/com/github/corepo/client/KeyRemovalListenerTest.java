@@ -14,14 +14,14 @@ public class KeyRemovalListenerTest {
 
     @Mock
     private Writeback writeback;
-    private RemovalNotification<String, UpdateTime> notification;
-    private final String key = "key";
+    private RemovalNotification<ItemKey, UpdateTime> notification;
+    private final ItemKey key = new ItemKey("key");
 
     @Test
     public void shouldWritebackItem() {
         sut = new KeyRemovalListener(writeback) {
             @Override
-            String getKey(RemovalNotification<String, UpdateTime> notification) {
+            ItemKey getKey(RemovalNotification<ItemKey, UpdateTime> notification) {
                 return key;
             }
         };
