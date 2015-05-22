@@ -297,9 +297,10 @@ public abstract class CoRepositoryAcceptanceTest {
     public void clear() {
         sut.delete(key);
         sut.delete(noKey);
-        sut.delete(keyForLockA.convertToLockedKey());
-        sut.delete(keyForLockB.convertToLockedKey());
         sut.delete(stringKey);
         sut.delete(intKey);
+        sut.delete(key.convertToLockedKey());
+        sut.delete(keyForLockA.convertToLockedKey());
+        sut.delete(keyForLockB.convertToLockedKey());
     }
 }
